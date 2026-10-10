@@ -222,7 +222,8 @@ def tool_uses(log_path: Path):
         if ev.get("type") != "assistant":
             continue
         mid = ev.get("message", {}).get("id")
-        if mid not in seen:
+        # 하위 에이전트(Agent 도구) 메시지는 parent_tool_use_id 가 있다 — 턴은 본 대화만 세고, 그 도구 호출은 현재 본 턴에 귀속한다
+        if mid not in seen and not ev.get("parent_tool_use_id"):
             seen.add(mid)
             turn += 1
         for blk in ev.get("message", {}).get("content", []) or []:
@@ -276,6 +277,16 @@ def parse_log(log_path: Path, relevant: list) -> dict:
         if ev.get("type") == "result":
             out["result"] = ev
     return out
+
+
+def total_tokens(res: dict) -> dict:
+    """총 토큰. result.usage 는 본 대화만 센다(하위 에이전트 제외) — modelUsage 합계를 주 지표로 쓴다."""
+    u = res.get("usage") or {}
+    main = sum(u.get(k) or 0 for k in ("input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
+    mu = res.get("modelUsage") or {}
+    allm = sum((v.get("inputTokens") or 0) + (v.get("outputTokens") or 0) + (v.get("cacheReadInputTokens") or 0)
+               + (v.get("cacheCreationInputTokens") or 0) for v in mu.values())
+    return {"total_tokens": allm if mu else main, "main_tokens": main, "models_used": sorted(mu)}
 
 
 def run_sh(script: str, cwd: Path, timeout: int = 1200) -> subprocess.CompletedProcess:
@@ -364,6 +375,7 @@ def run_one(case: str, cond: str, rep: int, model: str, budget: str, timeout_s: 
         "input_tokens": usage.get("input_tokens"), "output_tokens": usage.get("output_tokens"),
         "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"),
         "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
+        **total_tokens(res), "subagent_calls": parsed["tools"].get("Agent", 0) + parsed["tools"].get("Task", 0),
         "tool_calls": parsed["tool_calls"], "tools": parsed["tools"], "first_edit_turn": parsed["first_edit_turn"],
         "nav_reads": parsed["nav_reads"], "first_nav_turn": parsed["first_nav_turn"],
         "first_relevant_turn": parsed["first_relevant_turn"], "relevant_first_turns": parsed["relevant_first_turns"],

@@ -72,7 +72,7 @@ def main() -> int:
         "input_tokens": usage.get("input_tokens"), "output_tokens": usage.get("output_tokens"),
         "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"),
         "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
-        "tool_calls": parsed["tool_calls"], "audit_violations": violations, "changed_target_files": changed,
+        **R.total_tokens(res), "tool_calls": parsed["tool_calls"], "audit_violations": violations, "changed_target_files": changed,
         "nav_md_bytes": size, "nav_dir_files": sum(1 for x in (work / "nav").rglob("*") if x.is_file()) if (work / "nav").is_dir() else 0,
     }
     print(json.dumps(summary, ensure_ascii=False, indent=1))
@@ -80,11 +80,11 @@ def main() -> int:
         out.mkdir(parents=True)
         shutil.copy2(nav, out / "NAV.md")
         shutil.copytree(work / "nav", out / "nav")
-        total = sum(summary[k] or 0 for k in ("input_tokens", "output_tokens", "cache_creation_input_tokens", "cache_read_input_tokens"))
+        total = R.total_tokens(res)["total_tokens"]
         (out / "GENERATION.md").write_text(
             "# LLM 지도 생성 기록\n\n"
             f"- 모델: {a.model}, 프롬프트: `scripts/gen_llm_graph.py` PROMPT, 로그: `graphs/llm-generation/{run_id}.jsonl`\n"
-            f"- 총 토큰(input+output+cache_creation+cache_read): {total:,}, 비용 ${summary['total_cost_usd']}, 턴 {summary['num_turns']}, {summary['wall_s']}초\n"
+            f"- 총 토큰(modelUsage 합계, 하위 에이전트 포함): {total:,}, 비용 ${summary['total_cost_usd']}, 턴 {summary['num_turns']}, {summary['wall_s']}초\n"
             f"- NAV.md {size}바이트, nav/ 파일 {summary['nav_dir_files']}개, 감사 위반 {violations or '없음'}, 대상 파일 변경 {changed or '없음'}\n",
             encoding="utf-8")
     shutil.rmtree(run_dir, ignore_errors=True)
