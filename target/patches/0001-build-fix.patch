@@ -1,0 +1,122 @@
+diff --git a/src/main/java/com/fream/back/domain/accessLog/aop/AccessLogExceptionAspect.java b/src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogExceptionAspect.java
+similarity index 100%
+rename from src/main/java/com/fream/back/domain/accessLog/aop/AccessLogExceptionAspect.java
+rename to src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogExceptionAspect.java
+diff --git a/src/main/java/com/fream/back/domain/accessLog/aop/AccessLogMethodLoggingAspect.java b/src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogMethodLoggingAspect.java
+similarity index 100%
+rename from src/main/java/com/fream/back/domain/accessLog/aop/AccessLogMethodLoggingAspect.java
+rename to src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogMethodLoggingAspect.java
+diff --git a/src/main/java/com/fream/back/domain/accessLog/aop/AccessLogPerformanceAspect.java b/src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogPerformanceAspect.java
+similarity index 100%
+rename from src/main/java/com/fream/back/domain/accessLog/aop/AccessLogPerformanceAspect.java
+rename to src/main/java/com/fream/back/domain/accessLog/aop/aspect/AccessLogPerformanceAspect.java
+diff --git a/src/main/java/com/fream/back/domain/address/aop/AddressLoggingAspect.java b/src/main/java/com/fream/back/domain/address/aop/AddressLoggingAspect.java
+index 25b42c3..b90c776 100644
+--- a/src/main/java/com/fream/back/domain/address/aop/AddressLoggingAspect.java
++++ b/src/main/java/com/fream/back/domain/address/aop/AddressLoggingAspect.java
+@@ -303,15 +303,16 @@ public class AddressLoggingAspect {
+         boolean first = true;
+ 
+         for (int i = 0; i < args.length; i++) {
++            final int index = i;
+             // includeParams가 설정되어 있으면 해당 인덱스만 포함
+             if (includeParams.length > 0) {
+-                boolean included = Arrays.stream(includeParams).anyMatch(idx -> idx == i);
++                boolean included = Arrays.stream(includeParams).anyMatch(idx -> idx == index);
+                 if (!included) continue;
+             }
+ 
+             // excludeParams에 포함된 인덱스는 제외
+             if (excludeParams.length > 0) {
+-                boolean excluded = Arrays.stream(excludeParams).anyMatch(idx -> idx == i);
++                boolean excluded = Arrays.stream(excludeParams).anyMatch(idx -> idx == index);
+                 if (excluded) continue;
+             }
+ 
+diff --git a/src/main/java/com/fream/back/domain/order/controller/query/OrderQueryController.java b/src/main/java/com/fream/back/domain/order/controller/query/OrderQueryController.java
+index 4044abc..d9c6f7f 100644
+--- a/src/main/java/com/fream/back/domain/order/controller/query/OrderQueryController.java
++++ b/src/main/java/com/fream/back/domain/order/controller/query/OrderQueryController.java
+@@ -1,10 +1,8 @@
+ package com.fream.back.domain.order.controller.query;
+ 
+-import com.fream.back.domain.order.dto.OrderStatusDto;
+ import com.fream.back.domain.order.entity.Order;
+ import com.fream.back.domain.order.entity.OrderStatus;
+ import com.fream.back.domain.order.repository.OrderRepository;
+-import com.fream.back.domain.order.service.query.OrderQueryService;
+ import com.fream.back.global.dto.ResponseDto;
+ import com.fream.back.global.utils.SecurityUtils;
+ import lombok.RequiredArgsConstructor;
+@@ -61,7 +59,7 @@ public class OrderQueryController {
+             statusData.put("status", order.getStatus().name());
+             statusData.put("statusDescription", getStatusDescription(order.getStatus()));
+             statusData.put("canCancel", canCancelOrder(order.getStatus()));
+-            statusData.put("lastUpdated", order.getUpdatedAt());
++            statusData.put("lastUpdated", order.getModifiedDate());
+             statusData.put("totalAmount", order.getTotalAmount());
+ 
+             // 결제 정보 추가
+diff --git a/src/main/java/com/fream/back/domain/payment/repository/PaymentRepository.java b/src/main/java/com/fream/back/domain/payment/repository/PaymentRepository.java
+index b32a700..d96b169 100644
+--- a/src/main/java/com/fream/back/domain/payment/repository/PaymentRepository.java
++++ b/src/main/java/com/fream/back/domain/payment/repository/PaymentRepository.java
+@@ -68,6 +68,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
+     /**
+      * 특정 시간 이후 생성된 결제 조회 (모니터링용)
+      */
+-    @Query("SELECT p FROM Payment p WHERE p.createdAt >= :since")
++    @Query("SELECT p FROM Payment p WHERE p.createdDate >= :since")
+     List<Payment> findPaymentsCreatedSince(@Param("since") java.time.LocalDateTime since);
+ }
+\ No newline at end of file
+diff --git a/src/main/java/com/fream/back/global/config/security/SecurityConfig.java b/src/main/java/com/fream/back/global/config/security/SecurityConfig.java
+index 699393f..7b77732 100644
+--- a/src/main/java/com/fream/back/global/config/security/SecurityConfig.java
++++ b/src/main/java/com/fream/back/global/config/security/SecurityConfig.java
+@@ -2,6 +2,7 @@ package com.fream.back.global.config.security;
+ 
+ import com.fream.back.domain.user.redis.AuthRedisService;
+ import com.fream.back.domain.user.repository.UserRepository;
++import com.fream.back.domain.user.service.command.AuthService;
+ import com.fream.back.domain.user.security.oauth2.CustomOAuth2UserService;
+ import com.fream.back.domain.user.security.oauth2.OAuth2AuthenticationSuccessHandler;
+ import com.fream.back.global.config.security.filter.LoginAuthenticationFilter;
+@@ -31,14 +32,14 @@ public class SecurityConfig {
+     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+     private final UserRepository userRepository;
+     private final PasswordEncoder passwordEncoder;
++    private final AuthService authService;
+ 
+     @Bean
+     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+         // 커스텀 필터들 생성
+         IpBlockingFilter ipBlockingFilter = new IpBlockingFilter(ipBlockingRedisService);
+         JwtAuthenticationFilter jwtFilter = new JwtAuthenticationFilter(jwtTokenProvider, authRedisService);
+-        LoginAuthenticationFilter loginFilter = new LoginAuthenticationFilter(
+-                userRepository, passwordEncoder, jwtTokenProvider, authRedisService);
++        LoginAuthenticationFilter loginFilter = new LoginAuthenticationFilter(authService);
+         LogoutAuthenticationFilter logoutFilter = new LogoutAuthenticationFilter(
+                 authRedisService, jwtTokenProvider);
+         TokenRefreshFilter refreshFilter = new TokenRefreshFilter(
+diff --git a/src/main/java/com/fream/back/global/config/security/redis/IpBlockingFilter.java b/src/main/java/com/fream/back/global/security/filter/IpBlockingFilter.java
+similarity index 100%
+rename from src/main/java/com/fream/back/global/config/security/redis/IpBlockingFilter.java
+rename to src/main/java/com/fream/back/global/security/filter/IpBlockingFilter.java
+diff --git a/src/main/java/com/fream/back/global/config/security/redis/IpBlockingRedisService.java b/src/main/java/com/fream/back/global/security/redis/IpBlockingRedisService.java
+similarity index 100%
+rename from src/main/java/com/fream/back/global/config/security/redis/IpBlockingRedisService.java
+rename to src/main/java/com/fream/back/global/security/redis/IpBlockingRedisService.java
+diff --git a/src/main/resources/application-test.yml b/src/main/resources/application-test.yml
+index 770d5b3..7d447cc 100644
+--- a/src/main/resources/application-test.yml
++++ b/src/main/resources/application-test.yml
+@@ -1,6 +1,7 @@
+ spring:
+   datasource:
+-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
++    # MODE=MySQL: 엔티티에 MySQL 전용 columnDefinition(BIT(1) DEFAULT 1 등)이 있어 H2를 MySQL 호환 모드로 구동
++    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+     driver-class-name: org.h2.Driver
+   jpa:
+     hibernate:
