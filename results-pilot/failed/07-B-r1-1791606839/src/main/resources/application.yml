@@ -1,0 +1,30 @@
+spring:
+  # 기본 프로필을 local로 활성화 (원하면 주석 처리하고, 실행 시 -Dspring.profiles.active=local 로 설정해도 됨)
+  profiles:
+    active: prod
+  # 공통으로 사용하는 설정들
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+        one-indexed-parameters: true
+logging:
+  level:
+    org.hibernate.SQL: debug
+    # org.hibernate.type: trace  # 필요시 주석 해제
+
+# JWT 토큰 만료시간이나 공통 설정은 여기 둘 수 있음
+jwt:
+  expiration: 3600000      # (예시) 1시간
+  refreshExpiration: 3600000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
