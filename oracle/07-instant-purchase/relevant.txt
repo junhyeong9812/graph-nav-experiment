@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/order/controller/command/OrderBidCommandController.java
+src/main/java/com/fream/back/domain/order/service/command/OrderBidCommandService.java
+src/main/java/com/fream/back/domain/order/service/command/OrderCommandService.java
+src/main/java/com/fream/back/domain/payment/service/command/PaymentCommandService.java
+src/main/java/com/fream/back/domain/payment/entity/Payment.java
+src/main/java/com/fream/back/domain/payment/entity/PaymentStatus.java
+src/main/java/com/fream/back/domain/sale/entity/SaleBid.java
+src/main/java/com/fream/back/domain/sale/entity/Sale.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java

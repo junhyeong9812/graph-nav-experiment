@@ -1,0 +1,12 @@
+diff -ru a/src/main/java/com/fream/back/domain/payment/entity/Payment.java b/src/main/java/com/fream/back/domain/payment/entity/Payment.java
+--- a/src/main/java/com/fream/back/domain/payment/entity/Payment.java	2026-10-10 11:56:55.411360939 +0900
++++ b/src/main/java/com/fream/back/domain/payment/entity/Payment.java	2026-10-10 11:56:55.463445931 +0900
+@@ -59,7 +59,7 @@
+ 
+     public void setPaidAmount(double paidAmount) {
+         this.paidAmount = paidAmount;
+-        this.isSuccess = paidAmount > 0; // 결제 금액이 양수면 성공으로 간주
++        // 성공 여부는 금액이 아니라 실제 승인 결과로만 정한다(updateSuccessStatus)
+     }
+     public void updateSuccessStatus(boolean success) {
+         this.isSuccess = success;

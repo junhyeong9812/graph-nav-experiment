@@ -1,0 +1,2 @@
+com.fream.back.domain.address.service.query.AddressEncryptionRoundTripTest
+com.fream.back.domain.address.service.query.AddressQueryServiceTest

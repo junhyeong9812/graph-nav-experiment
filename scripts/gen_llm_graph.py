@@ -41,7 +41,7 @@ def main() -> int:
     run_dir = R.HOST_RUNS / run_id
     sb_home, sb_creds = R.make_sandbox(run_dir)
     work = run_dir / "work"
-    shutil.copytree(R.TARGET, work, ignore=R.COPY_IGNORE)
+    R.copy_target(work)
     log_dir = R.ROOT / "graphs" / "llm-generation"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_path = log_dir / f"{run_id}.jsonl"
@@ -60,6 +60,8 @@ def main() -> int:
     changed = []
     for f in R.TARGET.rglob("*"):
         rel = f.relative_to(R.TARGET)
+        if rel.as_posix().startswith(R.CHAR_TESTS.as_posix() + "/"):
+            continue
         if f.is_file() and not any(part in ("build", ".gradle", "logs") for part in rel.parts) and not f.name.endswith(".log"):
             w = work / rel
             if not w.is_file() or not filecmp.cmp(f, w, shallow=False):

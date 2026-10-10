@@ -1,0 +1,64 @@
+diff --git a/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java b/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
+index a3a4f1a..6a5ea68 100644
+--- a/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
+@@ -87,7 +87,7 @@ public class OrderBidRepositoryImpl implements OrderBidRepositoryCustom {
+                 .join(orderBid.productSize, productSize)
+                 .join(productSize.productColor, productColor)
+                 .join(productColor.product, product)
+-                .join(productColor.thumbnailImage, productImage)
++                .leftJoin(productColor.thumbnailImage, productImage)
+                 .leftJoin(orderBid.order, order)
+                 .leftJoin(order.orderShipment, orderShipment)
+                 .where(whereBuilder)
+diff --git a/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java b/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
+index 7aab145..85e8eab 100644
+--- a/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
++++ b/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
+@@ -157,6 +157,8 @@ public class IndexedProductRepository {
+                 )
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
++                .leftJoin(product.brand, QBrand.brand)
++                .leftJoin(productColor.thumbnailImage, QProductImage.productImage)
+                 .leftJoin(productColor.sizes, productSize)
+                 .leftJoin(productColor.interests, interest)
+                 .where(
+@@ -333,7 +335,8 @@ public class IndexedProductRepository {
+         QProductColor productColor = QProductColor.productColor;
+         QProductSize productSize = QProductSize.productSize;
+ 
+-        Long count = queryFactory.select(product.id.countDistinct())
++        // 본문과 같은 단위(상품 x 색상 행)로 센다
++        Long count = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff --git a/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java b/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
+index e4f23ef..4f53aaf 100644
+--- a/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
++++ b/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
+@@ -174,8 +174,8 @@ public class ProductQueryDslRepository {
+                 .toList();
+         System.out.println("content = " + content);
+ 
+-        // 6. 전체 데이터 수 조회
+-        long total = queryFactory.select(product.id.countDistinct())
++        // 6. 전체 데이터 수 조회 (본문과 같은 단위: 상품 x 색상 행)
++        long total = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff --git a/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java b/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
+index e0d0ddc..f3783a1 100644
+--- a/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
+@@ -85,7 +85,7 @@ public class SaleBidRepositoryImpl implements SaleBidRepositoryCustom {
+                     .join(saleBid.productSize, productSize)
+                     .join(productSize.productColor, productColor)
+                     .join(productColor.product, product)
+-                    .join(productColor.thumbnailImage, productImage)
++                    .leftJoin(productColor.thumbnailImage, productImage)
+                     .leftJoin(saleBid.sale, sale)
+                     .leftJoin(sale.sellerShipment, sellerShipment)
+                     .where(

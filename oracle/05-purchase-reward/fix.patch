@@ -1,0 +1,94 @@
+diff --git a/src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java b/src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java
+index 5f64e46..7c33d9a 100644
+--- a/src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java
++++ b/src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java
+@@ -18,6 +18,7 @@ import com.fream.back.domain.shipment.exception.ShipmentErrorCode;
+ import com.fream.back.domain.shipment.exception.ShipmentException;
+ import com.fream.back.domain.shipment.repository.OrderShipmentRepository;
+ import com.fream.back.domain.user.entity.User;
++import com.fream.back.domain.user.service.point.PointCommandService;
+ import com.fream.back.domain.warehouseStorage.service.command.WarehouseStorageCommandService;
+ import com.fream.back.global.utils.CjTrackingPlaywright;
+ import lombok.RequiredArgsConstructor;
+@@ -41,6 +42,7 @@ public class OrderShipmentCommandService {
+     private final OrderBidQueryService orderBidQueryService;
+     private final WarehouseStorageCommandService warehouseStorageCommandService;
+     private final CjTrackingPlaywright cjTrackingPlaywright;
++    private final PointCommandService pointCommandService;
+ 
+     /**
+      * 주문에 대한 배송 정보를 생성합니다.
+@@ -218,6 +220,9 @@ public class OrderShipmentCommandService {
+ 
+             log.info("구매자 알림 생성 완료: userId={}, orderId={}", buyer.getId(), order.getId());
+ 
++            // 구매 적립 포인트
++            rewardPurchasePoint(order);
++
+         } catch (Exception e) {
+             log.error("주문 완료 처리 실패: orderId={}, error={}", orderId, e.getMessage(), e);
+             throw new ShipmentException(
+@@ -366,6 +371,9 @@ public class OrderShipmentCommandService {
+                     log.info("배송 완료 알림 전송: userId={}, orderId={}",
+                             buyer.getId(), order.getId());
+ 
++                    // 구매 적립 포인트
++                    rewardPurchasePoint(order);
++
+                 } else if (newStatus == ShipmentStatus.OUT_FOR_DELIVERY &&
+                         shipment.getStatus() != ShipmentStatus.OUT_FOR_DELIVERY) {
+                     log.info("배송 출발 처리: shipmentId={}", shipment.getId());
+@@ -390,6 +398,25 @@ public class OrderShipmentCommandService {
+         log.info("전체 배송 상태 업데이트 완료: 성공={}건, 실패={}건", successCount, errorCount);
+     }
+ 
++    /**
++     * 배송 완료된 주문의 구매자에게 구매 적립 포인트를 적립하고 혜택 알림을 보냅니다.
++     *
++     * @param order 배송 완료된 주문
++     */
++    private void rewardPurchasePoint(Order order) {
++        User buyer = order.getUser();
++        int reward = pointCommandService.addPurchaseRewardPoint(buyer, order.getId(), order.getTotalAmount());
++        if (reward <= 0) {
++            return;
++        }
++        notificationCommandService.createNotification(
++                buyer.getId(),
++                NotificationCategory.SHOPPING,
++                NotificationType.BENEFIT,
++                "구매 적립 포인트 " + reward + "P가 적립되었습니다. 주문 ID: " + order.getId()
++        );
++    }
++
+     /**
+      * 배송사 상태 텍스트를 내부 ShipmentStatus로 매핑합니다.
+      *
+diff --git a/src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java b/src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java
+index df47e33..1317bfe 100644
+--- a/src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java
++++ b/src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java
+@@ -132,6 +132,23 @@ public class PointCommandService {
+         }
+     }
+ 
++    /**
++     * 배송 완료된 주문의 구매 적립 포인트(주문 총액의 1%, 1P 미만 버림)를 적립한다.
++     *
++     * @return 적립한 포인트. 1P 미만이면 적립하지 않고 0을 돌려준다.
++     */
++    @Transactional
++    public int addPurchaseRewardPoint(User buyer, Long orderId, int orderTotalAmount) {
++        int reward = orderTotalAmount / 100;
++        if (buyer == null || reward <= 0) {
++            return 0;
++        }
++        Point point = new Point(buyer, reward, "구매 적립 (주문 ID: " + orderId + ")");
++        pointRepository.save(point);
++        log.info("구매 적립 포인트 적립 - 사용자ID: {}, 주문ID: {}, 적립액: {}", buyer.getId(), orderId, reward);
++        return reward;
++    }
++
+     /**
+      * 만료된 포인트 처리 (스케줄러에서 호출)
+      */

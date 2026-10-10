@@ -1,0 +1,4 @@
+src/main/java/com/fream/back/domain/address/service/query/AddressQueryService.java
+src/main/java/com/fream/back/global/utils/PersonalDataEncryptionUtil.java
+src/main/java/com/fream/back/domain/address/service/command/AddressCommandService.java
+src/main/java/com/fream/back/domain/order/service/command/OrderCommandService.java

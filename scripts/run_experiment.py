@@ -84,6 +84,20 @@ DENY_RULES = [f"{tool}(/{REAL_HOME}/project/**)" for tool in ("Read", "Edit", "W
              [f"{tool}(//tmp/claude-*/**)" for tool in ("Read", "Grep", "Glob")] + ["WebFetch", "WebSearch"]
 
 COPY_IGNORE = shutil.ignore_patterns("build", ".gradle", "logs", "*.log")
+# 기존 동작 고정 테스트(293개)는 이름·기대값이 현재 버그 동작을 드러내므로 에이전트 사본에는 넣지 않고 판정 2차(회귀)에만 쓴다
+CHAR_TESTS = Path("src/test/java/com/fream/back/domain")
+
+
+def copy_target(dst: Path) -> None:
+    """에이전트용 대상 사본: 빌드 산출물과 고정 테스트를 뺀다."""
+    skip = TARGET / CHAR_TESTS
+
+    def ignore(d, names):
+        out = set(COPY_IGNORE(d, names))
+        if Path(d) == skip.parent:
+            out.add(skip.name)
+        return out
+    shutil.copytree(TARGET, dst, ignore=ignore)
 
 _lock_path = HOST_RUNS / ".lock"
 
@@ -117,7 +131,7 @@ def graph_index(kind: str) -> Path:
 
 def prepare_work(case: str, cond: str, work: Path) -> None:
     """대상 사본 + 과제 공개 파일 + 조건별 그래프."""
-    shutil.copytree(TARGET, work, ignore=COPY_IGNORE)
+    copy_target(work)
     shutil.copytree(CASES / case, work, dirs_exist_ok=True, ignore=shutil.ignore_patterns("TYPE"))
     kind, mode = CONDITIONS[cond]
     if kind:
@@ -134,6 +148,8 @@ def protected_files(case: str) -> dict:
             if not f.is_file():
                 continue
             rel = f.relative_to(base).as_posix()
+            if base == TARGET and rel.startswith(CHAR_TESTS.as_posix() + "/"):
+                continue  # 에이전트 사본에 없는 고정 테스트
             if rel in ("test.sh", "TASK.md") or rel.startswith("src/test/"):
                 out[rel] = f
     return out
@@ -293,8 +309,15 @@ def run_sh(script: str, cwd: Path, timeout: int = 1200) -> subprocess.CompletedP
     return subprocess.run(["bash", script], cwd=cwd, env=build_env(), capture_output=True, timeout=timeout)
 
 
+def gradle_test(d: Path, *patterns: str) -> subprocess.CompletedProcess:
+    args = ["./gradlew", "test"] + [x for p in patterns for x in ("--tests", p)]
+    return subprocess.run(args, cwd=d, env=build_env(), capture_output=True, timeout=1500)
+
+
 def judge(case: str, work: Path) -> dict:
-    """변조 검사 + (question 외) 보호 파일 복원·hidden 덮어쓰기 후 test.sh·hidden.sh 판정."""
+    """1차(성공): 보호 파일 복원 + hidden 테스트 덮어쓰기 → test.sh, hidden·보이는 테스트.
+    2차(회귀, 성공과 별도): 고정 테스트 덮어쓰기 − regression-exclude → com.fream.back.domain.*.
+    oracle/*/hidden/hidden.sh 는 과제 작성 때의 확인 스크립트이고, 판정은 이 함수가 한다."""
     prot = protected_files(case)
     tampered = sorted(rel for rel, src in prot.items()
                       if not (work / rel).is_file() or sha(work / rel) != sha(src))
@@ -308,13 +331,21 @@ def judge(case: str, work: Path) -> dict:
         for rel in tampered:  # 변조 여부와 무관하게 원본 보호 파일로 복원한 뒤 판정한다
             (jd / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(prot[rel], jd / rel)
-        shutil.copytree(ORACLE / case / "hidden", jd, dirs_exist_ok=True)
-        shutil.copy2(ORACLE / case / "regression-exclude.txt", jd / "regression-exclude.txt")
+        shutil.copytree(ORACLE / case / "hidden" / "src", jd / "src", dirs_exist_ok=True)
         t = run_sh("test.sh", jd)
-        h = run_sh("hidden.sh", jd)
-        return {"tampered": tampered, "test_pass": t.returncode == 0, "hidden_pass": h.returncode == 0,
-                "hidden_failed_tests": failed_tests(jd) if h.returncode else [],
-                "hidden_tail": h.stdout.decode(errors="replace")[-600:] if h.returncode else ""}
+        h = gradle_test(jd, "com.fream.back.hidden.*", "com.fream.back.visible.*")
+        out = {"tampered": tampered, "test_pass": t.returncode == 0, "hidden_pass": h.returncode == 0,
+               "hidden_failed_tests": failed_tests(jd) if h.returncode else [],
+               "hidden_tail": h.stdout.decode(errors="replace")[-600:] if h.returncode else ""}
+        shutil.rmtree(jd / "build" / "test-results", ignore_errors=True)
+        shutil.copytree(TARGET / CHAR_TESTS, jd / CHAR_TESTS, dirs_exist_ok=True)
+        for fqcn in read_lines(ORACLE / case / "regression-exclude.txt"):
+            (jd / "src/test/java" / (fqcn.replace(".", "/") + ".java")).unlink(missing_ok=True)
+        g = gradle_test(jd, "com.fream.back.domain.*")
+        fails = failed_tests(jd) if g.returncode else []
+        out.update({"regression_pass": g.returncode == 0, "regression_failed_tests": fails,
+                    "regression_error": (g.returncode != 0 and not fails)})  # 컴파일 실패 등
+        return out
     finally:
         shutil.rmtree(jd, ignore_errors=True)
 
@@ -393,7 +424,9 @@ def run_one(case: str, cond: str, rep: int, model: str, budget: str, timeout_s: 
     else:
         row.update({"test_pass": j["test_pass"], "hidden_pass": j["hidden_pass"],
                     "success": j["test_pass"] and j["hidden_pass"] and not j["tampered"],
-                    "hidden_failed_tests": j["hidden_failed_tests"], "hidden_tail": j["hidden_tail"]})
+                    "hidden_failed_tests": j["hidden_failed_tests"], "hidden_tail": j["hidden_tail"],
+                    "regression_pass": j["regression_pass"], "regression_failed_tests": j["regression_failed_tests"],
+                    "regression_error": j["regression_error"]})
     if not row["success"]:
         kept = RESULTS / "failed" / run_id
         shutil.copytree(run_dir / "work", kept, symlinks=True, ignore=COPY_IGNORE)

@@ -1,0 +1,7 @@
+src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java
+src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java
+src/main/java/com/fream/back/domain/user/entity/Point.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/notification/entity/NotificationType.java
+src/main/java/com/fream/back/domain/shipment/config/ShipmentItemProcessor.java
+src/main/java/com/fream/back/domain/order/entity/Order.java

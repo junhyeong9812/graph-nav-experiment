@@ -1,0 +1,5 @@
+src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
+src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
+src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
+src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
+src/main/java/com/fream/back/domain/order/service/query/OrderBidQueryService.java

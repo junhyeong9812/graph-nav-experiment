@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/shipment/controller/command/OrderShipmentCommandController.java
+src/main/java/com/fream/back/domain/shipment/service/command/OrderShipmentCommandService.java
+src/main/java/com/fream/back/domain/shipment/entity/OrderShipment.java
+src/main/java/com/fream/back/domain/order/entity/OrderStatus.java
+src/main/java/com/fream/back/domain/order/entity/Order.java
+src/main/java/com/fream/back/global/config/ShipmentBatchScheduler.java
+src/main/java/com/fream/back/domain/shipment/config/UpdateShipmentStatusesJobConfig.java
+src/main/java/com/fream/back/domain/shipment/config/ShipmentItemProcessor.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/order/service/kafka/OrderEventConsumer.java
