@@ -1,2 +1,3 @@
 target/fream-back/logs/
 *.log
+__pycache__/
