@@ -1,3 +1,5 @@
 target/fream-back/logs/
 *.log
 __pycache__/
+results-sonnet/failed/
+results-haiku/failed/
