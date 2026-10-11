@@ -1,0 +1,7 @@
+src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java
+src/main/java/com/fream/back/domain/m13/service/p15/Xnj18CommandService.java
+src/main/java/com/fream/back/domain/m13/entity/Xnj18.java
+src/main/java/com/fream/back/domain/m15/service/command/Xkh73CommandService.java
+src/main/java/com/fream/back/domain/m15/entity/Xkh73Type.java
+src/main/java/com/fream/back/domain/m12/config/Xth19Processor.java
+src/main/java/com/fream/back/domain/m16/entity/Xdg64.java

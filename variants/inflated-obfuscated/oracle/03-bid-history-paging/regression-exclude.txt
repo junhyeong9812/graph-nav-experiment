@@ -1,0 +1,3 @@
+com.fream.back.domain.m99.OrderBidRepositoryTest
+com.fream.back.domain.m85.repository.SaleBidRepositoryTest
+com.fream.back.domain.m30.repository.ProductQueryDslRepositoryTest

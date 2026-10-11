@@ -1,0 +1,84 @@
+diff -ruN a/src/main/java/com/fream/back/domain/product/repository/InterestRepository.java b/src/main/java/com/fream/back/domain/product/repository/InterestRepository.java
+--- a/src/main/java/com/fream/back/domain/product/repository/InterestRepository.java
++++ b/src/main/java/com/fream/back/domain/product/repository/InterestRepository.java
+@@ -14,4 +14,6 @@
+     Optional<Interest> findByUserAndProductColor(User user, ProductColor productColor);
+ 
+     List<Interest> findAllByUserId(Long userId);
++
++    List<Interest> findAllByProductColor(ProductColor productColor);
+ }
+\ 파일 끝 개행 문자 없음
+diff -ruN a/src/main/java/com/fream/back/domain/sale/service/command/SaleBidCommandService.java b/src/main/java/com/fream/back/domain/sale/service/command/SaleBidCommandService.java
+--- a/src/main/java/com/fream/back/domain/sale/service/command/SaleBidCommandService.java
++++ b/src/main/java/com/fream/back/domain/sale/service/command/SaleBidCommandService.java
+@@ -1,8 +1,14 @@
+ package com.fream.back.domain.sale.service.command;
+ 
++import com.fream.back.domain.notification.entity.NotificationCategory;
++import com.fream.back.domain.notification.entity.NotificationType;
++import com.fream.back.domain.notification.service.command.NotificationCommandService;
+ import com.fream.back.domain.order.entity.OrderBid;
+ import com.fream.back.domain.order.service.query.OrderBidQueryService;
++import com.fream.back.domain.product.entity.Interest;
++import com.fream.back.domain.product.entity.ProductColor;
+ import com.fream.back.domain.product.entity.ProductSize;
++import com.fream.back.domain.product.repository.InterestRepository;
+ import com.fream.back.domain.product.service.productSize.ProductSizeQueryService;
+ import com.fream.back.domain.sale.entity.BidStatus;
+ import com.fream.back.domain.sale.entity.Sale;
+@@ -23,6 +29,9 @@
+     private final ProductSizeQueryService productSizeQueryService;
+     private final SaleCommandService saleCommandService;
+     private final OrderBidQueryService orderBidQueryService;
++    private final InterestRepository interestRepository;
++    private final NotificationCommandService notificationCommandService;
++
+     @Transactional
+     public SaleBid createSaleBid(String sellerEmail, Long productSizeId, int bidPrice,
+                                  String returnAddress, String postalCode, String receiverPhone
+@@ -52,7 +61,10 @@
+         // 6. Sale에 SaleBid 추가 (연관관계 설정)
+         sale.assignSaleBid(saleBid);
+ 
+-        // 7. SaleBid 반환
++        // 7. 해당 상품 색상을 관심 등록한 회원에게 새 판매 알림
++        notifyInterestedUsers(seller, productSize, bidPrice);
++
++        // 8. SaleBid 반환
+         return saleBid;
+     }
+     @Transactional
+@@ -90,6 +102,32 @@
+         return sale.getId();
+     }
+ 
++    /**
++     * 새 판매 입찰이 등록된 상품 색상을 관심 등록한 회원(판매자 본인·비활성 회원 제외)에게 알림을 보냅니다.
++     */
++    private void notifyInterestedUsers(User seller, ProductSize productSize, int bidPrice) {
++        ProductColor color = productSize.getProductColor();
++        if (color == null) {
++            return;
++        }
++        String productName = color.getProduct() != null ? color.getProduct().getName() : "";
++        String message = String.format("관심 상품 %s (%s) 사이즈 %s에 새 판매 입찰이 등록되었습니다. 판매 희망가: %d원",
++                productName, color.getColorName(), productSize.getSize(), bidPrice);
++
++        for (Interest interest : interestRepository.findAllByProductColor(color)) {
++            User fan = interest.getUser();
++            if (fan == null || !fan.isActive() || fan.getId().equals(seller.getId())) {
++                continue;
++            }
++            notificationCommandService.createNotification(
++                    fan.getId(),
++                    NotificationCategory.SHOPPING,
++                    NotificationType.FAVORITE,
++                    message
++            );
++        }
++    }
++
+     @Transactional
+     public void deleteSaleBid(Long saleBidId) {
+         // SaleBid 조회

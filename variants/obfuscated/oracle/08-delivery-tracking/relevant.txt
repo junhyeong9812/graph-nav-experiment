@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/m12/controller/command/Xhx14CommandController.java
+src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java
+src/main/java/com/fream/back/domain/m12/entity/Xhx14.java
+src/main/java/com/fream/back/domain/m16/entity/Xdg64Status.java
+src/main/java/com/fream/back/domain/m16/entity/Xdg64.java
+src/main/java/com/fream/back/global/config/Xpb98BatchScheduler.java
+src/main/java/com/fream/back/domain/m12/config/Xqv91JobConfig.java
+src/main/java/com/fream/back/domain/m12/config/Xth19Processor.java
+src/main/java/com/fream/back/domain/m15/service/command/Xkh73CommandService.java
+src/main/java/com/fream/back/domain/m16/service/kafka/Xdg64EventConsumer.java

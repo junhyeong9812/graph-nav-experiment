@@ -1,0 +1,92 @@
+diff -ruN a/src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java b/src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java
+--- a/src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java
++++ b/src/main/java/com/fream/back/domain/m12/service/command/Xhx14CommandService.java
+@@ -18,6 +18,7 @@
+ import com.fream.back.domain.m12.exception.Xpb98Exception;
+ import com.fream.back.domain.m12.repository.Xhx14Repository;
+ import com.fream.back.domain.m13.entity.Xrd81;
++import com.fream.back.domain.m13.service.p15.Xnj18CommandService;
+ import com.fream.back.domain.m07.service.command.Xnn94CommandService;
+ import com.fream.back.global.utils.Xxx20;
+ import lombok.RequiredArgsConstructor;
+@@ -41,6 +42,7 @@
+     private final Xzj27QueryService orderBidQueryService;
+     private final Xnn94CommandService warehouseStorageCommandService;
+     private final Xxx20 cjTrackingPlaywright;
++    private final Xnj18CommandService pointCommandService;
+ 
+ 
+ 
+@@ -218,6 +220,9 @@
+ 
+             log.info("구매자 알림 생성 완료: userId={}, orderId={}", buyer.getId(), order.getId());
+ 
++
++            rewardPurchasePoint(order);
++
+         } catch (Exception e) {
+             log.error("주문 완료 처리 실패: orderId={}, error={}", orderId, e.getMessage(), e);
+             throw new Xpb98Exception(
+@@ -366,6 +371,9 @@
+                     log.info("배송 완료 알림 전송: userId={}, orderId={}",
+                             buyer.getId(), order.getId());
+ 
++
++                    rewardPurchasePoint(order);
++
+                 } else if (newStatus == Xpb98Status.OUT_FOR_DELIVERY &&
+                         shipment.getStatus() != Xpb98Status.OUT_FOR_DELIVERY) {
+                     log.info("배송 출발 처리: shipmentId={}", shipment.getId());
+@@ -391,6 +399,25 @@
+     }
+ 
+ 
++
++
++
++
++    private void rewardPurchasePoint(Xdg64 order) {
++        Xrd81 buyer = order.getUser();
++        int reward = pointCommandService.addPurchaseRewardPoint(buyer, order.getId(), order.getTotalAmount());
++        if (reward <= 0) {
++            return;
++        }
++        notificationCommandService.createNotification(
++                buyer.getId(),
++                Xzv64.SHOPPING,
++                Xkh73Type.BENEFIT,
++                "구매 적립 포인트 " + reward + "P가 적립되었습니다. 주문 ID: " + order.getId()
++        );
++    }
++
++
+ 
+ 
+ 
+diff -ruN a/src/main/java/com/fream/back/domain/m13/service/p15/Xnj18CommandService.java b/src/main/java/com/fream/back/domain/m13/service/p15/Xnj18CommandService.java
+--- a/src/main/java/com/fream/back/domain/m13/service/p15/Xnj18CommandService.java
++++ b/src/main/java/com/fream/back/domain/m13/service/p15/Xnj18CommandService.java
+@@ -135,6 +135,23 @@
+ 
+ 
+ 
++
++
++    @Transactional
++    public int addPurchaseRewardPoint(Xrd81 buyer, Long orderId, int orderTotalAmount) {
++        int reward = orderTotalAmount / 100;
++        if (buyer == null || reward <= 0) {
++            return 0;
++        }
++        Xnj18 point = new Xnj18(buyer, reward, "구매 적립 (주문 ID: " + orderId + ")");
++        pointRepository.save(point);
++        log.info("구매 적립 포인트 적립 - 사용자ID: {}, 주문ID: {}, 적립액: {}", buyer.getId(), orderId, reward);
++        return reward;
++    }
++
++
++
++
+     @Transactional
+     public int expirePoints() {
+         log.info("만료 포인트 처리 시작");

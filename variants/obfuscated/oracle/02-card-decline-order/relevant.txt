@@ -1,0 +1,4 @@
+src/main/java/com/fream/back/domain/m06/entity/Xbf54.java
+src/main/java/com/fream/back/domain/m06/entity/Xqg94.java
+src/main/java/com/fream/back/domain/m06/service/command/Xbf54CommandService.java
+src/main/java/com/fream/back/domain/m16/service/kafka/Xdg64EventConsumer.java

@@ -1,0 +1,4 @@
+com.fream.back.domain.order.OrderBidCommandServiceTest
+com.fream.back.domain.order.OrderEntityStateTest
+com.fream.back.domain.sale.entity.SaleEntityTest
+com.fream.back.domain.sale.service.SaleBidCommandServiceTest

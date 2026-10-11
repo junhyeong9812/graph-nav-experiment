@@ -1,0 +1,3 @@
+com.fream.back.domain.m64.PaymentCommandServiceTest
+com.fream.back.domain.m64.PaymentEntityStateTest
+com.fream.back.domain.m64.PaymentRepositoryTest

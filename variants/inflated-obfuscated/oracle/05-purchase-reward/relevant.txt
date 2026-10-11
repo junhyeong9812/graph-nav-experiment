@@ -1,0 +1,7 @@
+src/main/java/com/fream/back/domain/m45/service/command/Xfr60CommandService.java
+src/main/java/com/fream/back/domain/m22/service/p12/Xmt80CommandService.java
+src/main/java/com/fream/back/domain/m22/entity/Xmt80.java
+src/main/java/com/fream/back/domain/m52/service/command/Xbp24CommandService.java
+src/main/java/com/fream/back/domain/m52/entity/Xbp24Type.java
+src/main/java/com/fream/back/domain/m45/config/Xcz52Processor.java
+src/main/java/com/fream/back/domain/m99/entity/Xhq12.java

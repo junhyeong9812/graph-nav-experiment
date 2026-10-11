@@ -1,0 +1,5 @@
+src/main/java/com/fream/back/domain/m16/repository/Xzj27RepositoryImpl.java
+src/main/java/com/fream/back/domain/m10/repository/Xzz58RepositoryImpl.java
+src/main/java/com/fream/back/domain/m02/repository/Xmb97Repository.java
+src/main/java/com/fream/back/domain/m02/repository/Xvw73Repository.java
+src/main/java/com/fream/back/domain/m16/service/query/Xzj27QueryService.java

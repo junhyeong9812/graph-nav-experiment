@@ -1,0 +1,28 @@
+diff -ruN a/src/main/java/com/fream/back/domain/m10/entity/Xzz58.java b/src/main/java/com/fream/back/domain/m10/entity/Xzz58.java
+--- a/src/main/java/com/fream/back/domain/m10/entity/Xzz58.java
++++ b/src/main/java/com/fream/back/domain/m10/entity/Xzz58.java
+@@ -50,9 +50,9 @@
+     @Builder.Default
+     private boolean isInstantSale = false;
+ 
++
+     public void assignSale(Xgg74 sale) {
+         this.sale = sale;
+-        this.status = Xtz73Status.MATCHED;
+     }
+ 
+     public void assignOrder(Xdg64 order) {
+diff -ruN a/src/main/java/com/fream/back/domain/m16/entity/Xzj27.java b/src/main/java/com/fream/back/domain/m16/entity/Xzj27.java
+--- a/src/main/java/com/fream/back/domain/m16/entity/Xzj27.java
++++ b/src/main/java/com/fream/back/domain/m16/entity/Xzj27.java
+@@ -70,10 +70,7 @@
+ 
+         this.order = order;
+ 
+-
+         if (order != null) {
+-            this.status = Xtz73Status.MATCHED;
+-
+ 
+             if (order.getOrderBid() != this) {
+                 order.assignOrderBid(this);

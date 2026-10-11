@@ -1,0 +1,6 @@
+src/main/java/com/fream/back/domain/m99/entity/Xtw92.java
+src/main/java/com/fream/back/domain/m85/entity/Xzt63.java
+src/main/java/com/fream/back/domain/m99/service/command/Xtw92CommandService.java
+src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java
+src/main/java/com/fream/back/domain/m99/entity/Xhq12.java
+src/main/java/com/fream/back/domain/m85/entity/Xpj42.java

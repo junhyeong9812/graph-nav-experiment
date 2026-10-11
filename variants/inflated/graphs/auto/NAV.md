@@ -1,0 +1,142 @@
+# NAV — 코드 구조 지도 (자동 추출)
+
+`src/main/java`에서 javaparser로 기계 추출한 구조 사실만 담았다. 코드 주석은 옮기지 않았다.
+도메인 상세는 `nav/<도메인>.md`, global 패키지는 `nav/global.md`: 엔드포인트 표, 호출 사슬, 클래스 목록(파일 경로), JPA 연관, 이벤트·Kafka, AOP.
+표기: 도메인 패키지 = `src/main/java/com/fream/back/domain/<도메인>/` · `A#m` = 클래스 A의 메서드 m · `~` = 이름 기반 추정 · api = 컨트롤러 base path · ent = @Entity · dep = 참조하는 다른 도메인(서비스·리포지토리·엔티티·메시징 클래스) · msg = 발행 → 구독 도메인.
+
+## 도메인
+
+- **accessLog**
+- **address** · dep: 1
+- **adminaccesslog** · dep: 1
+- **adminaddress** · dep: 2
+- **adminchatquestion** · dep: 4
+- **adminevent** · dep: 4
+- **adminfaq** · dep: 2
+- **admininquiry** · dep: 3
+- **admininspection** · dep: 2
+- **adminmonitoring**
+- **adminnotice** · dep: 4
+- **adminnotification** · dep: 3
+- **adminorder** · dep: 11
+- **adminpayment** · dep: 4
+- **adminproduct** · dep: 5
+- **adminsale** · dep: 11
+- **adminshipment** · dep: 4
+- **adminstyle** · dep: 5
+- **adminuser** · dep: 3
+- **adminwarehousestorage** · dep: 2
+- **adminweather** · dep: 1
+- **chatQuestion** · dep: 2
+- **event** · dep: 2
+- **faq** · dep: 1
+- **inquiry** · dep: 1
+- **inspection** · dep: 1
+- **internalaccesslog** · dep: 1
+- **internaladdress** · dep: 2
+- **internalchatquestion** · dep: 4
+- **internalevent** · dep: 4
+- **internalfaq** · dep: 2
+- **internalinquiry** · dep: 3
+- **internalinspection** · dep: 2
+- **internalmonitoring**
+- **internalnotice** · dep: 4
+- **internalnotification** · dep: 3
+- **internalorder** · dep: 11
+- **internalpayment** · dep: 4
+- **internalproduct** · dep: 5
+- **internalsale** · dep: 11
+- **internalshipment** · dep: 4
+- **internalstyle** · dep: 5
+- **internaluser** · dep: 3
+- **internalwarehousestorage** · dep: 2
+- **internalweather** · dep: 1
+- **legacyaccesslog** · dep: 1
+- **legacyaddress** · dep: 2
+- **legacychatquestion** · dep: 4
+- **legacyevent** · dep: 4
+- **legacyfaq** · dep: 2
+- **legacyinquiry** · dep: 3
+- **legacyinspection** · dep: 2
+- **legacymonitoring**
+- **legacynotice** · dep: 4
+- **legacynotification** · dep: 3
+- **legacyorder** · dep: 11
+- **legacypayment** · dep: 4
+- **legacyproduct** · dep: 5
+- **legacysale** · dep: 11
+- **legacyshipment** · dep: 4
+- **legacystyle** · dep: 5
+- **legacyuser** · dep: 3
+- **legacywarehousestorage** · dep: 2
+- **legacyweather** · dep: 1
+- **monitoring**
+- **notice** · dep: 2
+- **notification** · dep: 2
+- **order** · dep: 7
+- **partneraccesslog** · dep: 1
+- **partneraddress** · dep: 2
+- **partnerchatquestion** · dep: 4
+- **partnerevent** · dep: 4
+- **partnerfaq** · dep: 2
+- **partnerinquiry** · dep: 3
+- **partnerinspection** · dep: 2
+- **partnermonitoring**
+- **partnernotice** · dep: 4
+- **partnernotification** · dep: 3
+- **partnerorder** · dep: 11
+- **partnerpayment** · dep: 4
+- **partnerproduct** · dep: 5
+- **partnersale** · dep: 11
+- **partnershipment** · dep: 4
+- **partnerstyle** · dep: 5
+- **partneruser** · dep: 3
+- **partnerwarehousestorage** · dep: 2
+- **partnerweather** · dep: 1
+- **payment** · dep: 4
+- **product** · dep: 3
+- **sale** · dep: 6
+- **settlementaccesslog** · dep: 1
+- **settlementaddress** · dep: 2
+- **settlementchatquestion** · dep: 4
+- **settlementevent** · dep: 4
+- **settlementfaq** · dep: 2
+- **settlementinquiry** · dep: 3
+- **settlementinspection** · dep: 2
+- **settlementmonitoring**
+- **settlementnotice** · dep: 4
+- **settlementnotification** · dep: 3
+- **settlementorder** · dep: 11
+- **settlementpayment** · dep: 4
+- **settlementproduct** · dep: 5
+- **settlementsale** · dep: 11
+- **settlementshipment** · dep: 4
+- **settlementstyle** · dep: 5
+- **settlementuser** · dep: 3
+- **settlementwarehousestorage** · dep: 2
+- **settlementweather** · dep: 1
+- **shipment** · dep: 5
+- **style** · dep: 2
+- **user** · dep: 5
+- **warehouseStorage** · dep: 3
+- **weather**
+
+## global (`src/main/java/com/fream/back/global/`)
+
+- **(root)**: FreamBackApplication
+- **config**: ApplicationShutdownConfig, BatchInfraConfig, CacheConfig +10
+- **config.aop**: PersonalDataEncryptionAspect
+- **config.kafka**: OrderKafkaConfig, PaymentKafkaConfig, UserAccessLogKafkaConfig
+- **config.security**: EncoderConfig, JwtAuthenticationFilter, JwtTokenProvider +6
+- **config.websocket**: WebSocketAuthInterceptor, WebSocketConfig
+- **controller**: LogController
+- **dto**: LogFileDTO, LogLineDTO, LogResponseDTO +2
+- **entity**: BaseEntity, BaseTimeEntity
+- **exception**: EntityNotFoundException, ErrorCode, GlobalErrorCode +3
+- **exception.file**: DirectoryCreationException, FileDownloadException, FileErrorCode +4
+- **exception.security**: ExpiredTokenException, InvalidRefreshTokenException, InvalidTokenException +5
+- **exception.websocket**: WebSocketAuthenticationException, WebSocketConnectionException, WebSocketErrorCode +2
+- **response**: ErrorResponse
+- **security.filter**: IpBlockingFilter
+- **security.redis**: IpBlockingRedisService
+- **utils**: CjTrackingPlaywright, FileUtils, NginxCachePurgeUtil +4

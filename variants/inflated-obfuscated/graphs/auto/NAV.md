@@ -1,0 +1,142 @@
+# NAV — 코드 구조 지도 (자동 추출)
+
+`src/main/java`에서 javaparser로 기계 추출한 구조 사실만 담았다. 코드 주석은 옮기지 않았다.
+도메인 상세는 `nav/<도메인>.md`, global 패키지는 `nav/global.md`: 엔드포인트 표, 호출 사슬, 클래스 목록(파일 경로), JPA 연관, 이벤트·Kafka, AOP.
+표기: 도메인 패키지 = `src/main/java/com/fream/back/domain/<도메인>/` · `A#m` = 클래스 A의 메서드 m · `~` = 이름 기반 추정 · api = 컨트롤러 base path · ent = @Entity · dep = 참조하는 다른 도메인(서비스·리포지토리·엔티티·메시징 클래스) · msg = 발행 → 구독 도메인.
+
+## 도메인
+
+- **m01** · dep: 4
+- **m02** · dep: 4
+- **m03** · dep: 3
+- **m04** · dep: 3
+- **m05** · dep: 1
+- **m06** · dep: 11
+- **m07** · dep: 5
+- **m08** · dep: 1
+- **m09** · dep: 4
+- **m10** · dep: 11
+- **m100** · dep: 2
+- **m101** · dep: 3
+- **m102** · dep: 3
+- **m103** · dep: 2
+- **m104** · dep: 11
+- **m105** · dep: 3
+- **m106** · dep: 4
+- **m107**
+- **m108** · dep: 4
+- **m109** · dep: 3
+- **m11** · dep: 2
+- **m110** · dep: 5
+- **m111** · dep: 2
+- **m112** · dep: 3
+- **m113** · dep: 2
+- **m114** · dep: 11
+- **m12**
+- **m13** · dep: 2
+- **m14** · dep: 2
+- **m15** · dep: 4
+- **m16** · dep: 2
+- **m17** · dep: 4
+- **m18** · dep: 2
+- **m19** · dep: 5
+- **m20** · dep: 5
+- **m21** · dep: 5
+- **m22** · dep: 5
+- **m23**
+- **m24** · dep: 4
+- **m25** · dep: 2
+- **m26** · dep: 1
+- **m27** · dep: 11
+- **m28** · dep: 5
+- **m29** · dep: 4
+- **m30** · dep: 3
+- **m31** · dep: 4
+- **m32** · dep: 3
+- **m33** · dep: 4
+- **m34** · dep: 2
+- **m35** · dep: 4
+- **m36** · dep: 4
+- **m37** · dep: 1
+- **m38** · dep: 4
+- **m39** · dep: 1
+- **m40**
+- **m41**
+- **m42** · dep: 2
+- **m43** · dep: 4
+- **m44** · dep: 4
+- **m45** · dep: 5
+- **m46** · dep: 1
+- **m47** · dep: 1
+- **m48**
+- **m49** · dep: 5
+- **m50** · dep: 5
+- **m51** · dep: 1
+- **m52** · dep: 2
+- **m53** · dep: 1
+- **m54** · dep: 11
+- **m55** · dep: 2
+- **m56** · dep: 3
+- **m57** · dep: 1
+- **m58** · dep: 2
+- **m59** · dep: 2
+- **m60** · dep: 1
+- **m61** · dep: 4
+- **m62** · dep: 4
+- **m63** · dep: 3
+- **m64** · dep: 4
+- **m65** · dep: 3
+- **m66** · dep: 1
+- **m67** · dep: 3
+- **m68** · dep: 1
+- **m69**
+- **m70** · dep: 4
+- **m71** · dep: 3
+- **m72** · dep: 2
+- **m73** · dep: 11
+- **m74** · dep: 11
+- **m75**
+- **m76** · dep: 2
+- **m77** · dep: 3
+- **m78** · dep: 2
+- **m79** · dep: 3
+- **m80** · dep: 2
+- **m81** · dep: 4
+- **m82** · dep: 4
+- **m83** · dep: 5
+- **m84** · dep: 1
+- **m85** · dep: 6
+- **m86** · dep: 2
+- **m87** · dep: 3
+- **m88** · dep: 5
+- **m89** · dep: 2
+- **m90** · dep: 4
+- **m91** · dep: 4
+- **m92** · dep: 2
+- **m93** · dep: 2
+- **m94** · dep: 11
+- **m95** · dep: 4
+- **m96** · dep: 11
+- **m97** · dep: 2
+- **m98** · dep: 4
+- **m99** · dep: 7
+
+## global (`src/main/java/com/fream/back/global/`)
+
+- **(root)**: FreamBackApplication
+- **config**: CacheConfig, RedisConfig, WebConfig +10
+- **config.aop**: Xhr91Aspect
+- **config.kafka**: Xhq12KafkaConfig, Xjt45KafkaConfig, Xrp33KafkaConfig
+- **config.security**: SecurityConfig, Xsc81Filter, Xvt76Config +6
+- **config.websocket**: WebSocketConfig, Xvp92Interceptor
+- **controller**: Xqv72Controller
+- **dto**: ResponseDto, Xmg87DTO, Xqv72ResponseDTO +2
+- **entity**: BaseEntity, Xzh80Entity
+- **exception**: ErrorCode, Xdf64Exception, Xkt44ErrorCode +3
+- **exception.file**: Xcs83Exception, Xkj24Exception, Xmq55Exception +4
+- **exception.security**: SecurityErrorCode, SecurityException, Xbz64Exception +5
+- **exception.websocket**: WebSocketErrorCode, WebSocketException, Xqb30Exception +2
+- **response**: ErrorResponse
+- **security.filter**: Xrs89Filter
+- **security.redis**: Xrs89RedisService
+- **utils**: PageUtils, SecurityUtils, Xbh78Util +4

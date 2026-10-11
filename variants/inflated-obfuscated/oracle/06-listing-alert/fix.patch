@@ -1,0 +1,82 @@
+diff -ruN a/src/main/java/com/fream/back/domain/m30/repository/Xrc72Repository.java b/src/main/java/com/fream/back/domain/m30/repository/Xrc72Repository.java
+--- a/src/main/java/com/fream/back/domain/m30/repository/Xrc72Repository.java
++++ b/src/main/java/com/fream/back/domain/m30/repository/Xrc72Repository.java
+@@ -14,4 +14,6 @@
+     Optional<Xrc72> findByUserAndProductColor(Xjm45 user, Xvm17 productColor);
+ 
+     List<Xrc72> findAllByUserId(Long userId);
++
++    List<Xrc72> findAllByProductColor(Xvm17 productColor);
+ }
+\ 파일 끝 개행 문자 없음
+diff -ruN a/src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java b/src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java
+--- a/src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java
++++ b/src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java
+@@ -1,8 +1,14 @@
+ package com.fream.back.domain.m85.service.command;
+ 
++import com.fream.back.domain.m52.entity.Xrv73;
++import com.fream.back.domain.m52.entity.Xbp24Type;
++import com.fream.back.domain.m52.service.command.Xbp24CommandService;
+ import com.fream.back.domain.m99.entity.Xtw92;
+ import com.fream.back.domain.m99.service.query.Xtw92QueryService;
++import com.fream.back.domain.m30.entity.Xrc72;
++import com.fream.back.domain.m30.entity.Xvm17;
+ import com.fream.back.domain.m30.entity.Xcc44;
++import com.fream.back.domain.m30.repository.Xrc72Repository;
+ import com.fream.back.domain.m30.service.p11.Xcc44QueryService;
+ import com.fream.back.domain.m85.entity.Xkh73Status;
+ import com.fream.back.domain.m85.entity.Xpj42;
+@@ -23,6 +29,9 @@
+     private final Xcc44QueryService productSizeQueryService;
+     private final Xpj42CommandService saleCommandService;
+     private final Xtw92QueryService orderBidQueryService;
++    private final Xrc72Repository interestRepository;
++    private final Xbp24CommandService notificationCommandService;
++
+     @Transactional
+     public Xzt63 createSaleBid(String sellerEmail, Long productSizeId, int bidPrice,
+                                  String returnAddress, String postalCode, String receiverPhone
+@@ -53,6 +62,9 @@
+         sale.assignSaleBid(saleBid);
+ 
+ 
++        notifyInterestedUsers(seller, productSize, bidPrice);
++
++
+         return saleBid;
+     }
+     @Transactional
+@@ -90,6 +102,32 @@
+         return sale.getId();
+     }
+ 
++
++
++
++    private void notifyInterestedUsers(Xjm45 seller, Xcc44 productSize, int bidPrice) {
++        Xvm17 color = productSize.getProductColor();
++        if (color == null) {
++            return;
++        }
++        String productName = color.getProduct() != null ? color.getProduct().getName() : "";
++        String message = String.format("관심 상품 %s (%s) 사이즈 %s에 새 판매 입찰이 등록되었습니다. 판매 희망가: %d원",
++                productName, color.getColorName(), productSize.getSize(), bidPrice);
++
++        for (Xrc72 interest : interestRepository.findAllByProductColor(color)) {
++            Xjm45 fan = interest.getUser();
++            if (fan == null || !fan.isActive() || fan.getId().equals(seller.getId())) {
++                continue;
++            }
++            notificationCommandService.createNotification(
++                    fan.getId(),
++                    Xrv73.SHOPPING,
++                    Xbp24Type.FAVORITE,
++                    message
++            );
++        }
++    }
++
+     @Transactional
+     public void deleteSaleBid(Long saleBidId) {
+ 

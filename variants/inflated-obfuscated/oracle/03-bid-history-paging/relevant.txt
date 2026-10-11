@@ -1,0 +1,5 @@
+src/main/java/com/fream/back/domain/m99/repository/Xtw92RepositoryImpl.java
+src/main/java/com/fream/back/domain/m85/repository/Xzt63RepositoryImpl.java
+src/main/java/com/fream/back/domain/m30/repository/Xgx95Repository.java
+src/main/java/com/fream/back/domain/m30/repository/Xdr94Repository.java
+src/main/java/com/fream/back/domain/m99/service/query/Xtw92QueryService.java

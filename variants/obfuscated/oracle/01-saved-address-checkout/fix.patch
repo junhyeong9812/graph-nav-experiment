@@ -1,0 +1,60 @@
+diff -ruN a/src/main/java/com/fream/back/domain/m11/service/query/Xms98QueryService.java b/src/main/java/com/fream/back/domain/m11/service/query/Xms98QueryService.java
+--- a/src/main/java/com/fream/back/domain/m11/service/query/Xms98QueryService.java
++++ b/src/main/java/com/fream/back/domain/m11/service/query/Xms98QueryService.java
+@@ -34,8 +34,7 @@
+             log.info("주소 목록 조회 시작: 사용자={}", email);
+ 
+ 
+-            String encryptedEmail = encryptionUtil.deterministicEncrypt(email);
+-            Xrd81 user = userRepository.findByEmail(encryptedEmail)
++            Xrd81 user = userRepository.findByEmail(email)
+                     .orElseThrow(() -> new Xkk16Exception(
+                             "이메일 '" + email + "'에 해당하는 사용자를 찾을 수 없습니다."
+                     ));
+@@ -71,8 +70,7 @@
+             log.info("단일 주소 조회 시작: 사용자={}, 주소ID={}", email, addressId);
+ 
+ 
+-            String encryptedEmail = encryptionUtil.deterministicEncrypt(email);
+-            Xrd81 user = userRepository.findByEmail(encryptedEmail)
++            Xrd81 user = userRepository.findByEmail(email)
+                     .orElseThrow(() -> new Xkk16Exception(
+                             "이메일 '" + email + "'에 해당하는 사용자를 찾을 수 없습니다."
+                     ));
+@@ -116,8 +114,7 @@
+             log.info("이름으로 주소 검색 시작: 사용자={}, 검색어={}", email, recipientName);
+ 
+ 
+-            String encryptedEmail = encryptionUtil.deterministicEncrypt(email);
+-            Xrd81 user = userRepository.findByEmail(encryptedEmail)
++            Xrd81 user = userRepository.findByEmail(email)
+                     .orElseThrow(() -> new Xkk16Exception(
+                             "이메일 '" + email + "'에 해당하는 사용자를 찾을 수 없습니다."
+                     ));
+@@ -161,8 +158,7 @@
+             log.info("전화번호로 주소 검색 시작: 사용자={}, 검색어={}", email, phoneNumber);
+ 
+ 
+-            String encryptedEmail = encryptionUtil.deterministicEncrypt(email);
+-            Xrd81 user = userRepository.findByEmail(encryptedEmail)
++            Xrd81 user = userRepository.findByEmail(email)
+                     .orElseThrow(() -> new Xkk16Exception(
+                             "이메일 '" + email + "'에 해당하는 사용자를 찾을 수 없습니다."
+                     ));
+diff -ruN a/src/main/java/com/fream/back/global/utils/Xtf80Util.java b/src/main/java/com/fream/back/global/utils/Xtf80Util.java
+--- a/src/main/java/com/fream/back/global/utils/Xtf80Util.java
++++ b/src/main/java/com/fream/back/global/utils/Xtf80Util.java
+@@ -99,12 +99,8 @@
+ 
+         try {
+ 
+-
+-            byte[] deterministicKeyBytes = generateDeterministicKeyBytes(plainText);
+-
+             Cipher cipher = Cipher.getInstance(DETERMINISTIC_ALGORITHM);
+-
+-            SecretKeySpec keySpec = new SecretKeySpec(deterministicKeyBytes, "AES");
++            SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "AES");
+ 
+             cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+             byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));

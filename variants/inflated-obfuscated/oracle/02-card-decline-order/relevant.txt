@@ -1,0 +1,4 @@
+src/main/java/com/fream/back/domain/m64/entity/Xjt45.java
+src/main/java/com/fream/back/domain/m64/entity/Xxf47.java
+src/main/java/com/fream/back/domain/m64/service/command/Xjt45CommandService.java
+src/main/java/com/fream/back/domain/m99/service/kafka/Xhq12EventConsumer.java

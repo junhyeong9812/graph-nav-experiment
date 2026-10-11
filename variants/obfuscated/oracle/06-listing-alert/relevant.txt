@@ -1,0 +1,8 @@
+src/main/java/com/fream/back/domain/m10/service/command/Xzz58CommandService.java
+src/main/java/com/fream/back/domain/m10/service/command/Xgg74CommandService.java
+src/main/java/com/fream/back/domain/m02/repository/Xrf21Repository.java
+src/main/java/com/fream/back/domain/m02/entity/Xrf21.java
+src/main/java/com/fream/back/domain/m02/entity/Xdh20.java
+src/main/java/com/fream/back/domain/m15/service/command/Xkh73CommandService.java
+src/main/java/com/fream/back/domain/m15/entity/Xkh73Type.java
+src/main/java/com/fream/back/domain/m13/entity/Xrd81.java

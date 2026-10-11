@@ -1,0 +1,8 @@
+src/main/java/com/fream/back/domain/m85/service/command/Xzt63CommandService.java
+src/main/java/com/fream/back/domain/m85/service/command/Xpj42CommandService.java
+src/main/java/com/fream/back/domain/m30/repository/Xrc72Repository.java
+src/main/java/com/fream/back/domain/m30/entity/Xrc72.java
+src/main/java/com/fream/back/domain/m30/entity/Xcc44.java
+src/main/java/com/fream/back/domain/m52/service/command/Xbp24CommandService.java
+src/main/java/com/fream/back/domain/m52/entity/Xbp24Type.java
+src/main/java/com/fream/back/domain/m22/entity/Xjm45.java

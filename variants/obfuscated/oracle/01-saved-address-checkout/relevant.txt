@@ -1,0 +1,4 @@
+src/main/java/com/fream/back/domain/m11/service/query/Xms98QueryService.java
+src/main/java/com/fream/back/global/utils/Xtf80Util.java
+src/main/java/com/fream/back/domain/m11/service/command/Xms98CommandService.java
+src/main/java/com/fream/back/domain/m16/service/command/Xdg64CommandService.java

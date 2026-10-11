@@ -1,0 +1,6 @@
+src/main/java/com/fream/back/domain/m16/entity/Xzj27.java
+src/main/java/com/fream/back/domain/m10/entity/Xzz58.java
+src/main/java/com/fream/back/domain/m16/service/command/Xzj27CommandService.java
+src/main/java/com/fream/back/domain/m10/service/command/Xzz58CommandService.java
+src/main/java/com/fream/back/domain/m16/entity/Xdg64.java
+src/main/java/com/fream/back/domain/m10/entity/Xgg74.java

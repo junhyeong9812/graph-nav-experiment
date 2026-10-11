@@ -1,0 +1,58 @@
+diff -ruN a/src/main/java/com/fream/back/domain/m02/repository/Xmb97Repository.java b/src/main/java/com/fream/back/domain/m02/repository/Xmb97Repository.java
+--- a/src/main/java/com/fream/back/domain/m02/repository/Xmb97Repository.java
++++ b/src/main/java/com/fream/back/domain/m02/repository/Xmb97Repository.java
+@@ -175,7 +175,7 @@
+         System.out.println("content = " + content);
+ 
+ 
+-        long total = queryFactory.select(product.id.countDistinct())
++        long total = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff -ruN a/src/main/java/com/fream/back/domain/m02/repository/Xvw73Repository.java b/src/main/java/com/fream/back/domain/m02/repository/Xvw73Repository.java
+--- a/src/main/java/com/fream/back/domain/m02/repository/Xvw73Repository.java
++++ b/src/main/java/com/fream/back/domain/m02/repository/Xvw73Repository.java
+@@ -157,6 +157,8 @@
+                 )
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
++                .leftJoin(product.brand, QXfw75.xfw75)
++                .leftJoin(productColor.thumbnailImage, QXzq99.xzq99)
+                 .leftJoin(productColor.sizes, productSize)
+                 .leftJoin(productColor.interests, interest)
+                 .where(
+@@ -333,7 +335,8 @@
+         QXfp92 productColor = QXfp92.xfp92;
+         QXdh20 productSize = QXdh20.xdh20;
+ 
+-        Long count = queryFactory.select(product.id.countDistinct())
++
++        Long count = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff -ruN a/src/main/java/com/fream/back/domain/m10/repository/Xzz58RepositoryImpl.java b/src/main/java/com/fream/back/domain/m10/repository/Xzz58RepositoryImpl.java
+--- a/src/main/java/com/fream/back/domain/m10/repository/Xzz58RepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/m10/repository/Xzz58RepositoryImpl.java
+@@ -85,7 +85,7 @@
+                     .join(saleBid.productSize, productSize)
+                     .join(productSize.productColor, productColor)
+                     .join(productColor.product, product)
+-                    .join(productColor.thumbnailImage, productImage)
++                    .leftJoin(productColor.thumbnailImage, productImage)
+                     .leftJoin(saleBid.sale, sale)
+                     .leftJoin(sale.sellerShipment, sellerShipment)
+                     .where(
+diff -ruN a/src/main/java/com/fream/back/domain/m16/repository/Xzj27RepositoryImpl.java b/src/main/java/com/fream/back/domain/m16/repository/Xzj27RepositoryImpl.java
+--- a/src/main/java/com/fream/back/domain/m16/repository/Xzj27RepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/m16/repository/Xzj27RepositoryImpl.java
+@@ -87,7 +87,7 @@
+                 .join(orderBid.productSize, productSize)
+                 .join(productSize.productColor, productColor)
+                 .join(productColor.product, product)
+-                .join(productColor.thumbnailImage, productImage)
++                .leftJoin(productColor.thumbnailImage, productImage)
+                 .leftJoin(orderBid.order, order)
+                 .leftJoin(order.orderShipment, orderShipment)
+                 .where(whereBuilder)

@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/m99/controller/command/Xtw92CommandController.java
+src/main/java/com/fream/back/domain/m99/service/command/Xtw92CommandService.java
+src/main/java/com/fream/back/domain/m99/service/command/Xhq12CommandService.java
+src/main/java/com/fream/back/domain/m64/service/command/Xjt45CommandService.java
+src/main/java/com/fream/back/domain/m64/entity/Xjt45.java
+src/main/java/com/fream/back/domain/m64/entity/Xjt45Status.java
+src/main/java/com/fream/back/domain/m85/entity/Xzt63.java
+src/main/java/com/fream/back/domain/m85/entity/Xpj42.java
+src/main/java/com/fream/back/domain/m52/service/command/Xbp24CommandService.java
+src/main/java/com/fream/back/domain/m45/service/command/Xfr60CommandService.java

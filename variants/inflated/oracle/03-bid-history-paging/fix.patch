@@ -1,0 +1,60 @@
+diff -ruN a/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java b/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
+--- a/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/order/repository/OrderBidRepositoryImpl.java
+@@ -87,7 +87,7 @@
+                 .join(orderBid.productSize, productSize)
+                 .join(productSize.productColor, productColor)
+                 .join(productColor.product, product)
+-                .join(productColor.thumbnailImage, productImage)
++                .leftJoin(productColor.thumbnailImage, productImage)
+                 .leftJoin(orderBid.order, order)
+                 .leftJoin(order.orderShipment, orderShipment)
+                 .where(whereBuilder)
+diff -ruN a/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java b/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
+--- a/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
++++ b/src/main/java/com/fream/back/domain/product/repository/IndexedProductRepository.java
+@@ -157,6 +157,8 @@
+                 )
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
++                .leftJoin(product.brand, QBrand.brand)
++                .leftJoin(productColor.thumbnailImage, QProductImage.productImage)
+                 .leftJoin(productColor.sizes, productSize)
+                 .leftJoin(productColor.interests, interest)
+                 .where(
+@@ -333,7 +335,8 @@
+         QProductColor productColor = QProductColor.productColor;
+         QProductSize productSize = QProductSize.productSize;
+ 
+-        Long count = queryFactory.select(product.id.countDistinct())
++        // 본문과 같은 단위(상품 x 색상 행)로 센다
++        Long count = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff -ruN a/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java b/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
+--- a/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
++++ b/src/main/java/com/fream/back/domain/product/repository/ProductQueryDslRepository.java
+@@ -174,8 +174,8 @@
+                 .toList();
+         System.out.println("content = " + content);
+ 
+-        // 6. 전체 데이터 수 조회
+-        long total = queryFactory.select(product.id.countDistinct())
++        // 6. 전체 데이터 수 조회 (본문과 같은 단위: 상품 x 색상 행)
++        long total = queryFactory.select(productColor.id.countDistinct())
+                 .from(product)
+                 .leftJoin(product.colors, productColor)
+                 .leftJoin(productColor.sizes, productSize)
+diff -ruN a/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java b/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
+--- a/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
++++ b/src/main/java/com/fream/back/domain/sale/repository/SaleBidRepositoryImpl.java
+@@ -85,7 +85,7 @@
+                     .join(saleBid.productSize, productSize)
+                     .join(productSize.productColor, productColor)
+                     .join(productColor.product, product)
+-                    .join(productColor.thumbnailImage, productImage)
++                    .leftJoin(productColor.thumbnailImage, productImage)
+                     .leftJoin(saleBid.sale, sale)
+                     .leftJoin(sale.sellerShipment, sellerShipment)
+                     .where(
