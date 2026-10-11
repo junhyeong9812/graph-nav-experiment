@@ -4,6 +4,18 @@
 
 [compare-issue-archive](https://github.com/junhyeong9812/compare-issue-archive)의 결론 4번(미검증 가설)을 이어받는다. 그 실험은 이슈·결정 기록의 가치를 쟀고, 이 실험은 구조 지도의 가치를 잰다.
 
+## 결론 (2026-10-11)
+
+**규칙적인 레거시(Java 약 8만 줄)에서 미리 만든 탐색 그래프는 에이전트 토큰을 의미 있게 줄이지 못했다.**
+
+- **규모:** 336회(7조건 × 8과제 × 3회 × Sonnet·Haiku)를 실행했다.
+- **토큰:** 지도 없는 조건 대비 총 토큰은 Sonnet 0.87~1.15, Haiku 1.10~1.22다. 사전 기준(< 0.8)을 만족한 조건이 없다.
+- **성공률·질문 점수:** 차이가 없다.
+- **원인:** 지도가 없어도 원인 파일에 3턴이면 닿는다. grep으로 충분히 찾히는 구조라 지도는 고정비만 더했다.
+- **좁은 예외:** Sonnet + Opus가 만든 LLM 지도에서만 반복 패턴·이해 질문 과제의 절감 경향이 보였다(0.62~0.82). 구간은 1을 포함하고, 지도 생성비 회수에 약 340회가 필요하다.
+
+상세: `docs/analysis.md`, 설계: `docs/adr/0001-graph-nav-experiment-design.md`
+
 ## 구조
 
 ```
@@ -12,7 +24,12 @@ target/SOURCE.md     출처·제외 목록·수선 내역·알려진 한계
 target/patches/      빌드 수선 패치
 target-docs/         원본에 있던 사람이 쓴 문서(조건 재료, 에이전트 기본 사본에는 없음)
 scripts/check-target.sh   빌드 + 테스트 확인
-docs/                작업 기록·의심 지점 목록(에이전트에게 주지 않음)
+docs/                작업 기록·의심 지점 목록·분석(에이전트에게 주지 않음)
+tools/navgraph/      자동 지도 생성기(javaparser)
+graphs/              조건별 지도: auto(기계 추출) · human(원본 문서) · llm(Opus 1회 생성)
+cases/ · oracle/     과제 8개(공개 파일) · 판정 자료(숨김 테스트·정답 패치·체크리스트)
+scripts/             러너 run_experiment.py · 채점 grade_answers.py · 집계 analyze.py
+results-*/           실행 기록(runs.jsonl·grades.jsonl·raw 로그·답안)
 ```
 
 ## 확인
@@ -23,4 +40,5 @@ bash scripts/check-target.sh   # JDK 17(~/.sdkman/candidates/java/17.0.13-tem), 
 
 ## 진행
 
-- 2026-10-10 대상 준비 완료: 본 코드 Java 약 8만 줄, 고정 테스트 294개. 다음은 실험 설계(`docs/plans/NEXT.md`).
+- 2026-10-10 대상 준비 완료: 본 코드 Java 약 8만 줄, 고정 테스트 294개.
+- 2026-10-11 본 실험 완료: 가설 기각. 다음 후보는 `docs/plans/NEXT.md`.
