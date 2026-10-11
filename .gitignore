@@ -4,3 +4,4 @@ __pycache__/
 results-sonnet/failed/
 results-haiku/failed/
 variants/*/target/
+results-var-*/failed/

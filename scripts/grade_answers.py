@@ -73,6 +73,7 @@ def main() -> int:
     todo = [r for r in rows if r.get("type") == "question" and r.get("valid") and r["run_id"] not in done]
     print(f"채점 대상 {len(todo)}건", flush=True)
     for r in todo:
+        R.set_variant(r.get("variant", "original"))  # 변형 실행은 매핑 적용된 과제·체크리스트로 채점
         case = r["case"]
         g = grade((R.CASES / case / "TASK.md").read_text(), (R.ORACLE / case / "checklist.md").read_text(),
                   (R.ROOT / r["answer"]).read_text() if r.get("answer_present") else "", a.grader)
