@@ -33,6 +33,7 @@
 | 2026-10-11 | 표본 검수: 최저점 07-HF-r2(6/8) C4 감점을 체크리스트 41-45행·답안 37-38행과 대조 → 채점자 판단 맞음 | |
 | 2026-10-11 | **판정 결함 발견:** 05 LF 실패 4건이 전부 `periodicTracking*`만 실패. `updateShipmentStatuses()` 호출처 0(grep), LLM 지도 nav/shipment.md:61이 '호출처 없음'으로 정확히 서술 | 원 판정 유지, analysis.md에 보정값(LF 15/18) 병기 |
 | 2026-10-11 | 분석 문서 docs/analysis.md, ADR 결과 절. 결과 폴더 failed/(약 8GB)는 .gitignore | |
+| 2026-10-11 | 사이클 마감: NEXT 갱신. CS 이슈 아카이브는 study-note 금지 영역이라 보류(CS 이슈 후보: 디스크 가득 참 → ENOSPC가 에이전트 도구 결과에 섞임, 판정 오류 원인 미구분) | 보류 |
 
 ## 생략한 검증
 
