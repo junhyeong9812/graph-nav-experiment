@@ -1,0 +1,12 @@
+diff -ruN a/src/main/java/com/fream/back/domain/notification/entity/Notification.java b/src/main/java/com/fream/back/domain/notification/entity/Notification.java
+--- a/src/main/java/com/fream/back/domain/notification/entity/Notification.java
++++ b/src/main/java/com/fream/back/domain/notification/entity/Notification.java
+@@ -59,7 +59,7 @@
+ 
+     public void setPaidAmount(double paidAmount) {
+         this.paidAmount = paidAmount;
+-        this.isSuccess = paidAmount > 0;
++
+     }
+     public void updateSuccessStatus(boolean success) {
+         this.isSuccess = success;

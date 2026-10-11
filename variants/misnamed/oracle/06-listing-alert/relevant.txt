@@ -1,0 +1,8 @@
+src/main/java/com/fream/back/domain/sale/service/command/StyleBidCommandService.java
+src/main/java/com/fream/back/domain/sale/service/command/SaleCommandService.java
+src/main/java/com/fream/back/domain/product/repository/InterestRepository.java
+src/main/java/com/fream/back/domain/product/entity/Interest.java
+src/main/java/com/fream/back/domain/product/entity/UserSize.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/notification/entity/PaymentType.java
+src/main/java/com/fream/back/domain/user/entity/User.java

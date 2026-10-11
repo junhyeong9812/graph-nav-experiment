@@ -1,0 +1,28 @@
+diff -ruN a/src/main/java/com/fream/back/domain/faq/entity/FaqBid.java b/src/main/java/com/fream/back/domain/faq/entity/FaqBid.java
+--- a/src/main/java/com/fream/back/domain/faq/entity/FaqBid.java
++++ b/src/main/java/com/fream/back/domain/faq/entity/FaqBid.java
+@@ -70,10 +70,7 @@
+ 
+         this.order = order;
+ 
+-
+         if (order != null) {
+-            this.status = BidStatus.MATCHED;
+-
+ 
+             if (order.getOrderBid() != this) {
+                 order.assignOrderBid(this);
+diff -ruN a/src/main/java/com/fream/back/domain/style/entity/StyleBid.java b/src/main/java/com/fream/back/domain/style/entity/StyleBid.java
+--- a/src/main/java/com/fream/back/domain/style/entity/StyleBid.java
++++ b/src/main/java/com/fream/back/domain/style/entity/StyleBid.java
+@@ -50,9 +50,9 @@
+     @Builder.Default
+     private boolean isInstantSale = false;
+ 
++
+     public void assignSale(Style sale) {
+         this.sale = sale;
+-        this.status = BidStatus.MATCHED;
+     }
+ 
+     public void assignOrder(Faq order) {

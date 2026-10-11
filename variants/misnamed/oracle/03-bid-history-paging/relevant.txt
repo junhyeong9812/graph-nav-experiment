@@ -1,0 +1,5 @@
+src/main/java/com/fream/back/domain/order/repository/FaqBidRepositoryImpl.java
+src/main/java/com/fream/back/domain/sale/repository/StyleBidRepositoryImpl.java
+src/main/java/com/fream/back/domain/product/repository/UserQueryDslRepository.java
+src/main/java/com/fream/back/domain/product/repository/IndexedUserRepository.java
+src/main/java/com/fream/back/domain/order/service/query/FaqBidQueryService.java

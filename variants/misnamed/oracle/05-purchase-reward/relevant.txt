@@ -1,0 +1,7 @@
+src/main/java/com/fream/back/domain/shipment/service/command/FaqAddressCommandService.java
+src/main/java/com/fream/back/domain/user/service/point/PointCommandService.java
+src/main/java/com/fream/back/domain/user/entity/Point.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/notification/entity/PaymentType.java
+src/main/java/com/fream/back/domain/shipment/config/AddressItemProcessor.java
+src/main/java/com/fream/back/domain/order/entity/Faq.java

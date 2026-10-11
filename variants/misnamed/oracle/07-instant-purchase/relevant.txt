@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/order/controller/command/FaqBidCommandController.java
+src/main/java/com/fream/back/domain/order/service/command/FaqBidCommandService.java
+src/main/java/com/fream/back/domain/order/service/command/FaqCommandService.java
+src/main/java/com/fream/back/domain/payment/service/command/PaymentCommandService.java
+src/main/java/com/fream/back/domain/payment/entity/Payment.java
+src/main/java/com/fream/back/domain/payment/entity/NotificationStatus.java
+src/main/java/com/fream/back/domain/sale/entity/StyleBid.java
+src/main/java/com/fream/back/domain/sale/entity/Sale.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/shipment/service/command/FaqAddressCommandService.java

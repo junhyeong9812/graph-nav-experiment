@@ -1,0 +1,4 @@
+src/main/java/com/fream/back/domain/payment/entity/Payment.java
+src/main/java/com/fream/back/domain/payment/entity/CardNotification.java
+src/main/java/com/fream/back/domain/payment/service/command/PaymentCommandService.java
+src/main/java/com/fream/back/domain/order/service/kafka/FaqEventConsumer.java

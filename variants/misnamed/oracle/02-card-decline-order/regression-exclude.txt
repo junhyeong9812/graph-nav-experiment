@@ -1,0 +1,3 @@
+com.fream.back.domain.notification.PaymentCommandServiceTest
+com.fream.back.domain.notification.PaymentEntityStateTest
+com.fream.back.domain.notification.PaymentRepositoryTest

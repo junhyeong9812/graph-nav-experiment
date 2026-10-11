@@ -1,0 +1,82 @@
+diff -ruN a/src/main/java/com/fream/back/domain/style/service/command/StyleBidCommandService.java b/src/main/java/com/fream/back/domain/style/service/command/StyleBidCommandService.java
+--- a/src/main/java/com/fream/back/domain/style/service/command/StyleBidCommandService.java
++++ b/src/main/java/com/fream/back/domain/style/service/command/StyleBidCommandService.java
+@@ -1,8 +1,14 @@
+ package com.fream.back.domain.style.service.command;
+ 
++import com.fream.back.domain.payment.entity.PaymentCategory;
++import com.fream.back.domain.payment.entity.PaymentType;
++import com.fream.back.domain.payment.service.command.PaymentCommandService;
+ import com.fream.back.domain.faq.entity.FaqBid;
+ import com.fream.back.domain.faq.service.query.FaqBidQueryService;
++import com.fream.back.domain.user.entity.Interest;
++import com.fream.back.domain.user.entity.UserColor;
+ import com.fream.back.domain.user.entity.UserSize;
++import com.fream.back.domain.user.repository.InterestRepository;
+ import com.fream.back.domain.user.service.productSize.UserSizeQueryService;
+ import com.fream.back.domain.style.entity.BidStatus;
+ import com.fream.back.domain.style.entity.Style;
+@@ -23,6 +29,9 @@
+     private final UserSizeQueryService productSizeQueryService;
+     private final StyleCommandService saleCommandService;
+     private final FaqBidQueryService orderBidQueryService;
++    private final InterestRepository interestRepository;
++    private final PaymentCommandService notificationCommandService;
++
+     @Transactional
+     public StyleBid createSaleBid(String sellerEmail, Long productSizeId, int bidPrice,
+                                  String returnAddress, String postalCode, String receiverPhone
+@@ -53,6 +62,9 @@
+         sale.assignSaleBid(saleBid);
+ 
+ 
++        notifyInterestedUsers(seller, productSize, bidPrice);
++
++
+         return saleBid;
+     }
+     @Transactional
+@@ -90,6 +102,32 @@
+         return sale.getId();
+     }
+ 
++
++
++
++    private void notifyInterestedUsers(Product seller, UserSize productSize, int bidPrice) {
++        UserColor color = productSize.getProductColor();
++        if (color == null) {
++            return;
++        }
++        String productName = color.getProduct() != null ? color.getProduct().getName() : "";
++        String message = String.format("관심 상품 %s (%s) 사이즈 %s에 새 판매 입찰이 등록되었습니다. 판매 희망가: %d원",
++                productName, color.getColorName(), productSize.getSize(), bidPrice);
++
++        for (Interest interest : interestRepository.findAllByProductColor(color)) {
++            Product fan = interest.getUser();
++            if (fan == null || !fan.isActive() || fan.getId().equals(seller.getId())) {
++                continue;
++            }
++            notificationCommandService.createNotification(
++                    fan.getId(),
++                    PaymentCategory.SHOPPING,
++                    PaymentType.FAVORITE,
++                    message
++            );
++        }
++    }
++
+     @Transactional
+     public void deleteSaleBid(Long saleBidId) {
+ 
+diff -ruN a/src/main/java/com/fream/back/domain/user/repository/InterestRepository.java b/src/main/java/com/fream/back/domain/user/repository/InterestRepository.java
+--- a/src/main/java/com/fream/back/domain/user/repository/InterestRepository.java
++++ b/src/main/java/com/fream/back/domain/user/repository/InterestRepository.java
+@@ -14,4 +14,6 @@
+     Optional<Interest> findByUserAndProductColor(Product user, UserColor productColor);
+ 
+     List<Interest> findAllByUserId(Long userId);
++
++    List<Interest> findAllByProductColor(UserColor productColor);
+ }
+\ 파일 끝 개행 문자 없음

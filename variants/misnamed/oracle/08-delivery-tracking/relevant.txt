@@ -1,0 +1,10 @@
+src/main/java/com/fream/back/domain/shipment/controller/command/FaqAddressCommandController.java
+src/main/java/com/fream/back/domain/shipment/service/command/FaqAddressCommandService.java
+src/main/java/com/fream/back/domain/shipment/entity/FaqAddress.java
+src/main/java/com/fream/back/domain/order/entity/FaqStatus.java
+src/main/java/com/fream/back/domain/order/entity/Faq.java
+src/main/java/com/fream/back/global/config/AddressBatchScheduler.java
+src/main/java/com/fream/back/domain/shipment/config/UpdateAddressStatusesJobConfig.java
+src/main/java/com/fream/back/domain/shipment/config/AddressItemProcessor.java
+src/main/java/com/fream/back/domain/notification/service/command/NotificationCommandService.java
+src/main/java/com/fream/back/domain/order/service/kafka/FaqEventConsumer.java

@@ -1,0 +1,6 @@
+src/main/java/com/fream/back/domain/order/entity/FaqBid.java
+src/main/java/com/fream/back/domain/sale/entity/StyleBid.java
+src/main/java/com/fream/back/domain/order/service/command/FaqBidCommandService.java
+src/main/java/com/fream/back/domain/sale/service/command/StyleBidCommandService.java
+src/main/java/com/fream/back/domain/order/entity/Faq.java
+src/main/java/com/fream/back/domain/sale/entity/Sale.java
