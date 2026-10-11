@@ -7,11 +7,13 @@
   obfuscated          타입·도메인 패키지 이름을 무의미 이름으로 바꾸고(구조 접미어 Service·Repository 등은 유지),
                       Java 주석을 지운다(줄 수 보존 — 체크리스트의 파일:줄 근거가 그대로 맞는다).
   inflated-obfuscated 부풀린 뒤 난독화.
+  misnamed            도메인 업무어를 짝지어 서로 맞바꾼다(naming-followup). 타입 이름의 단어열과 도메인 최상위 패키지만
+                      바꾸고(순열이라 충돌 없음) 주석을 지운다. event 도메인은 구조 단어 Event 와 겹쳐 제외한다.
 
 결과: variants/<name>/{target/fream-back, cases, oracle, MAPPING.json}
   - 정답 패치는 "원본에 fix.patch 적용 → 같은 변환" 결과와 변환된 원본의 diff 로 다시 만든다.
   - 매핑은 원본(부풀린 뒤) src/main 타입에서 한 번 만들고 모든 트리에 똑같이 쓴다(시드 고정, 결정적).
-사용: python3 scripts/make_variant.py inflated|obfuscated|inflated-obfuscated
+사용: python3 scripts/make_variant.py inflated|obfuscated|inflated-obfuscated|misnamed
 """
 import json
 import random
@@ -128,8 +130,14 @@ class Mapper:
         return f"com{sep}fream{sep}back{sep}domain{sep}" + sep.join(self.map_pkg_path(segs))
 
     def map_text(self, s: str) -> str:
-        s = self.fq.sub(self._fq, s)
-        s = self.short.sub(lambda m: "domain/" + "/".join(self.map_pkg_path(m.group(1).split("/"))), s)
+        # 경로 치환 결과는 자리표시자로 보호한다: 이름 순열(misnamed)에서는 새 이름이 다른 옛 이름이라
+        # 아래 타입 이름 단계가 한 번 더 바꾸면 안 된다(난독화에서는 겹치지 않아 결과 동일)
+        held = []
+        def hold(t: str) -> str:
+            held.append(t)
+            return f"\x00{len(held) - 1}\x00"
+        s = self.fq.sub(lambda m: hold(self._fq(m)), s)
+        s = self.short.sub(lambda m: hold("domain/" + "/".join(self.map_pkg_path(m.group(1).split("/")))), s)
         lib = set(re.findall(r"^import\s+(?:static\s+)?(?!com\.fream)[\w.]+\.(\w+);", s, re.M))
         out, last = [], 0
         for m in self.tok.finditer(s):
@@ -154,7 +162,7 @@ class Mapper:
             out.append(q + self.types[name] + suffix)
             last = m.end()
         out.append(s[last:])
-        s = "".join(out)
+        s = re.sub(r"\x00(\d+)\x00", lambda m: held[int(m.group(1))], "".join(out))
         # QueryDSL 정적 필드: QNew.oldLower → QNew.newLower
         for old, new in self.types.items():
             if f"Q{new}." in s:
@@ -339,6 +347,60 @@ def build_obf_mapping(tree: Path) -> tuple:
     return types, pkgs
 
 
+MISNAME_EXCLUDE = {"event"}  # 도메인 이름이 구조 단어(Event)와 같아 바꾸면 역할 접미어까지 바뀐다
+
+
+def build_misnamed_mapping(tree: Path) -> tuple:
+    """도메인 업무어를 시드 고정으로 짝지어 서로 맞바꾼다: 타입 이름 안의 단어열(대소문자 무시, 단어 단위)과
+    도메인 최상위 패키지. 짝 맞바꾸기는 단어열에 대한 순열이라 바뀐 이름끼리 충돌하지 않는다."""
+    base = tree / JAVA_ROOT
+    names = set()
+    for f in base.rglob("*.java"):
+        for a, b in re.findall(r"\b(?:class|interface|enum|record)\s+([A-Z]\w*)|@interface\s+([A-Z]\w*)", f.read_text()):
+            names.add(a or b)
+    names.discard("FreamBackApplication")
+    dom = base / "domain"
+    tops = sorted(p.name for p in dom.iterdir() if p.is_dir() and p.name not in MISNAME_EXCLUDE)
+    order = tops[:]
+    random.Random(SEED).shuffle(order)
+    perm = {}
+    pairs = [order[i:i + 2] for i in range(0, len(order) - len(order) % 2, 2)]
+    for a, b in pairs:
+        perm[a], perm[b] = b, a
+    if len(order) % 2:  # 남은 하나는 마지막 짝과 3자 순환
+        a, b = pairs[-1]
+        c = order[-1]
+        perm[a], perm[b], perm[c] = b, c, a
+    words = {t: camel_words(t[:1].upper() + t[1:]) for t in tops}
+    seqs = sorted(tops, key=lambda t: -len(words[t]))  # 긴 단어열 먼저(AccessLog 가 Log 보다 먼저)
+    types = {}
+    for n in sorted(names):
+        w = camel_words(n)
+        out, i, hit = [], 0, False
+        while i < len(w):
+            for t in seqs:
+                k = len(words[t])
+                if [x.lower() for x in w[i:i + k]] == [x.lower() for x in words[t]]:
+                    out += words[perm[t]]
+                    i += k
+                    hit = True
+                    break
+            else:
+                out.append(w[i])
+                i += 1
+        if hit:
+            types[n] = "".join(out)
+    new = list(types.values())
+    if len(set(new)) != len(new) or (set(new) & (names - set(types))):
+        raise SystemExit("이름 충돌(misnamed)")
+    pkgs = {}
+    for d in sorted({d.relative_to(dom).as_posix().replace("/", ".") for d in dom.rglob("*") if d.is_dir()}):
+        parts = d.split(".")
+        if parts[0] in perm:
+            pkgs[d] = ".".join([perm[parts[0]]] + parts[1:])
+    return types, pkgs, perm
+
+
 def spring_table_name(cls: str) -> str:
     """Spring Boot 기본 물리 이름 규칙(CamelCaseToUnderscoresNamingStrategy)."""
     out = []
@@ -349,12 +411,21 @@ def spring_table_name(cls: str) -> str:
     return "".join(out)
 
 
+PIN_NAMED_TABLE = False  # build() 가 misnamed 에서 켠다
+
+
 def pin_table_name(s: str, renamed: set, entities: set = frozenset()) -> str:
     """이름이 바뀌는 엔티티의 암묵 테이블 이름을 고정한다(같은 줄에 붙여 줄 수 보존). DB 이름은 코드 이름과 따로 남는다."""
     m = re.search(r"\bclass\s+(\w+)(?:\s+extends\s+(\w+))?", s)
     if m and m.group(2) in entities:  # 상속 계층의 하위 엔티티는 루트가 테이블을 정한다
         return s
-    if not m or m.group(1) not in renamed or "@Table" in s or not re.search(r"^\s*@Entity\b", s, re.M):
+    if not m or m.group(1) not in renamed or not re.search(r"^\s*@Entity\b", s, re.M):
+        return s
+    if "@Table" in s:
+        # 이름 없는 @Table(indexes=…): 이름 순열(misnamed)에서는 암묵 이름이 다른 엔티티 테이블과 겹친다 → name 을 넣는다.
+        # 난독화는 겹치지 않아 기존 출력 유지를 위해 건드리지 않는다
+        if PIN_NAMED_TABLE and not re.search(r"@Table\(\s*name\s*=", s):
+            return re.sub(r"@Table\(", f'@Table(name = "{spring_table_name(m.group(1))}", ', s, count=1)
         return s
     return re.sub(r"^(\s*@Entity\b(?:\([^)]*\))?)", rf'\1 @jakarta.persistence.Table(name = "{spring_table_name(m.group(1))}")',
                   s, count=1, flags=re.M)
@@ -412,6 +483,7 @@ def diff_trees(a: Path, b: Path) -> str:
 def build(name: str) -> None:
     do_inflate = name.startswith("inflated")
     do_obf = name.endswith("obfuscated")
+    do_mis = name == "misnamed"
     out = ROOT / "variants" / name
     if out.exists():
         shutil.rmtree(out)
@@ -434,6 +506,13 @@ def build(name: str) -> None:
         types, pkgs = build_obf_mapping(base)
         mp = Mapper(types, pkgs)
         mapping = {"types": types, "pkgs": pkgs}
+    if do_mis:
+        global PIN_NAMED_TABLE
+        PIN_NAMED_TABLE = True
+        types, pkgs, perm = build_misnamed_mapping(base)
+        mp = Mapper(types, pkgs)
+        mapping = {"types": types, "pkgs": pkgs, "domain_perm": perm}
+    do_obf = do_obf or do_mis  # 주석 제거 범위는 난독화와 같다
     transform_tree(base, mp, strip=do_obf)
     shutil.copytree(base, out / "target" / "fream-back")
 
@@ -467,6 +546,6 @@ def build(name: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("inflated", "obfuscated", "inflated-obfuscated"):
+    if len(sys.argv) != 2 or sys.argv[1] not in ("inflated", "obfuscated", "inflated-obfuscated", "misnamed"):
         raise SystemExit(__doc__)
     build(sys.argv[1])

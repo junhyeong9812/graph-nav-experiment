@@ -47,6 +47,8 @@ CONDITIONS = {
     "AF": ("auto", "F"), "AC": ("auto", "C"),
     "HF": ("human", "F"), "HC": ("human", "C"),
     "LF": ("llm", "F"), "LC": ("llm", "C"),
+    # naming-followup: 이름 대응표(glossaries/<변형>/<종류>.md)를 CLAUDE.md 로. nav 없음, 지도 인덱스 상한 비대상
+    "GD": ("gloss-dom", "G"), "GE": ("gloss-ent", "G"), "GA": ("gloss-all", "G"),
 }
 INDEX_LIMIT = 8192
 
@@ -148,7 +150,12 @@ def prepare_work(case: str, cond: str, work: Path) -> None:
     copy_target(work)
     shutil.copytree(CASES / case, work, dirs_exist_ok=True, ignore=shutil.ignore_patterns("TYPE"))
     kind, mode = CONDITIONS[cond]
-    if kind:
+    if mode == "G":
+        g = ROOT / "glossaries" / (VARIANT or "original") / f"{kind}.md"
+        if not g.is_file():
+            raise ValueError(f"대응표 없음: {g}")
+        shutil.copy2(g, work / "CLAUDE.md")
+    elif kind:
         idx = graph_index(kind)
         shutil.copy2(idx, work / ("NAV.md" if mode == "F" else "CLAUDE.md"))
         shutil.copytree(GRAPHS / kind / "nav", work / "nav")
