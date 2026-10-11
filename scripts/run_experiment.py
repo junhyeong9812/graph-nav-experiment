@@ -77,7 +77,7 @@ PROMPT_NAV_FIRST = (
 # 감사: 도구 호출 입력(명령·경로·패턴)에 나타나면 무효. 도구 결과(파일 내용)는 보지 않는다 —
 # 대상 코드·사람 문서 안에 github 링크·도커 이미지 이름이 원래 들어 있어 결과까지 보면 오탐이 난다.
 AUDIT_INPUT = [re.escape(str(REAL_HOME / "project")), r"study-note", r"graph-nav-experiment", r"oracle/",
-               r"target-suspected", r"hidden\.sh", r"fix\.patch", r"github\.com", r"/tmp/claude-\d+"]
+               r"target-suspected", r"hidden\.sh", r"fix\.patch", r"MAPPING\.json", r"github\.com", r"/tmp/claude-\d+"]
 AUDIT_BASH = [r"(^|[\s;&|(])(curl|wget|nc|ssh|scp|gh)\s", r"\bgit\s+(clone|fetch|pull|ls-remote|remote)\b"]
 FORBIDDEN_TOOLS = {"WebFetch", "WebSearch"}
 DENY_RULES = [f"{tool}(/{REAL_HOME}/project/**)" for tool in ("Read", "Edit", "Write", "Grep", "Glob")] + \
@@ -100,6 +100,20 @@ def copy_target(dst: Path) -> None:
     shutil.copytree(TARGET, dst, ignore=ignore)
 
 _lock_path = HOST_RUNS / ".lock"
+
+
+VARIANT = "original"
+
+
+def set_variant(name: str) -> None:
+    """변형(size-structure-variants): 대상·과제·oracle·지도 경로를 variants/<name>/ 로 바꾼다."""
+    global TARGET, CASES, ORACLE, GRAPHS, VARIANT
+    if name == "original":
+        return
+    base = ROOT / "variants" / name
+    if not base.is_dir():
+        raise SystemExit(f"변형 없음: {base}")
+    TARGET, CASES, ORACLE, GRAPHS, VARIANT = base / "target" / "fream-back", base / "cases", base / "oracle", base / "graphs", name
 
 
 def set_dirs(results: str) -> None:
@@ -398,7 +412,7 @@ def run_one(case: str, cond: str, rep: int, model: str, budget: str, timeout_s: 
     j = judge(case, run_dir / "work")
     ctype = case_type(case)
     row = {
-        "run_id": run_id, "case": case, "type": ctype, "cond": cond, "rep": rep, "model": model,
+        "run_id": run_id, "variant": VARIANT, "case": case, "type": ctype, "cond": cond, "rep": rep, "model": model,
         "rc": rc, "timed_out": timed_out, "wall_s": round(wall, 1),
         "result_subtype": res.get("subtype"), "is_error": res.get("is_error"),
         "num_turns": res.get("num_turns"), "duration_ms": res.get("duration_ms"),
@@ -468,8 +482,10 @@ def main() -> int:
     ap.add_argument("--budget", default="5")
     ap.add_argument("--timeout", type=int, default=2700)
     ap.add_argument("--results-dir", default="results")
+    ap.add_argument("--variant", default="original", help="variants/<이름> (inflated·obfuscated·inflated-obfuscated)")
     ap.add_argument("--dry-run", action="store_true", help="실행하지 않고 조건별 사본 구성·프롬프트만 출력")
     a = ap.parse_args()
+    set_variant(a.variant)
     set_dirs(a.results_dir)
 
     cases = sorted(d.name for d in CASES.iterdir() if d.is_dir())

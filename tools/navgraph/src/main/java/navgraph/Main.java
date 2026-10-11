@@ -757,7 +757,7 @@ public class Main {
         for (String d : domains()) write(outDir.resolve("nav/" + d + ".md"), detail(d, deps));
         write(outDir.resolve("nav/global.md"), detail(GLOBAL, deps));
         String nav = null;
-        for (int level = 0; level <= 6; level++) {
+        for (int level = 0; level <= 9; level++) {  // 7~9: 도메인이 아주 많을 때(부풀린 변형)만 쓰는 압축 단계
             nav = index(deps, level);
             if (nav.getBytes(StandardCharsets.UTF_8).length <= NAV_LIMIT) break;
         }
@@ -811,8 +811,8 @@ public class Main {
 
     String index(Map<String, Map<String, Map<String, TreeSet<String>>>> deps, int level) {
         boolean counts = level < 1;
-        int ctlCap = level >= 5 ? 2 : level >= 2 ? 4 : 0;
-        int entCap = level >= 5 ? 2 : level >= 3 ? 4 : 0;
+        int ctlCap = level >= 8 ? 1 : level >= 5 ? 2 : level >= 2 ? 4 : 0;
+        int entCap = level >= 8 ? 1 : level >= 5 ? 2 : level >= 3 ? 4 : 0;
         int globalCap = level >= 6 ? 3 : level >= 4 ? 6 : 0;
         StringBuilder sb = new StringBuilder();
         sb.append("# NAV — 코드 구조 지도 (자동 추출)\n\n");
@@ -825,13 +825,13 @@ public class Main {
             StringBuilder line = new StringBuilder("- **" + d + "**");
             if (counts) line.append(" (").append(fileCount(d)).append(")");
             List<String> ctl = controllerSummaries(d);
-            if (!ctl.isEmpty()) line.append(" · api: ").append(capList(ctl, ctlCap));
+            if (!ctl.isEmpty() && level < 9) line.append(" · api: ").append(capList(ctl, ctlCap));
             List<String> ent = entityNames(d);
-            if (!ent.isEmpty()) line.append(" · ent: ").append(capList(ent, entCap));
+            if (!ent.isEmpty() && level < 9) line.append(" · ent: ").append(capList(ent, entCap));
             Map<String, Map<String, TreeSet<String>>> dd = deps.getOrDefault(d, Map.of());
-            if (!dd.isEmpty()) line.append(" · dep: ").append(String.join(", ", dd.keySet()));
+            if (!dd.isEmpty()) line.append(" · dep: ").append(level >= 7 ? String.valueOf(dd.size()) : String.join(", ", dd.keySet()));
             List<String> msg = messagingSummary(d);
-            if (!msg.isEmpty()) line.append(" · msg: ").append(String.join("; ", msg));
+            if (!msg.isEmpty() && level < 8) line.append(" · msg: ").append(String.join("; ", msg));
             sb.append(line).append("\n");
         }
         sb.append("\n## global (`src/main/java/com/fream/back/global/`)\n\n");

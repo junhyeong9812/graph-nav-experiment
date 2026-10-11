@@ -3,3 +3,4 @@ target/fream-back/logs/
 __pycache__/
 results-sonnet/failed/
 results-haiku/failed/
+variants/*/target/
