@@ -1,0 +1,1 @@
+{"run_id": "05-B-r2-1791712291", "cond": "B", "rep": 2, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}

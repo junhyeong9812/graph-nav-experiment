@@ -1,0 +1,3 @@
+{"run_id": "05-GE-r1-1791762153", "cond": "GE", "rep": 1, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-GA-r2-1791764228", "cond": "GA", "rep": 2, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-GE-r4-1791768486", "cond": "GE", "rep": 4, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}

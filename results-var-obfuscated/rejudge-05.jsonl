@@ -1,0 +1,6 @@
+{"run_id": "05-B-r1-1791704388", "cond": "B", "rep": 1, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-B-r2-1791705024", "cond": "B", "rep": 2, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-AC-r2-1791705691", "cond": "AC", "rep": 2, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-B-r3-1791707086", "cond": "B", "rep": 3, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-B-r4-1791707644", "cond": "B", "rep": 4, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
+{"run_id": "05-B-r5-1791709696", "cond": "B", "rep": 5, "orig_success": false, "v2_success": false, "reason": "죽은 경로 밖 실패: completeOrderSendsBenefitNotificationAndKeepsExistingOnes, immediateTrackingCheckRewardsExactlyOnce"}
