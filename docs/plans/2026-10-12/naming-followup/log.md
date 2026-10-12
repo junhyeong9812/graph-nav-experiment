@@ -40,3 +40,38 @@
 
   misnamed 모드(`build_misnamed_mapping`, 이름 없는 `@Table`에 name 고정), `make_glossary.py`, 러너 GD·GE·GA, `analyze_naming.py`.
 - **커밋:** ed7cbbb·bae5bb3·ab12412·cdb60ed + 이 docs 커밋. push 안 함.
+
+## 이력 재작성 (2026-10-12, 공개 전)
+
+개발용 `localhost-key.pem`(fream-back 원본의 nginx 자체 서명 키, 5개 경로)을 공개 전에 모든 브랜치 이력에서 제거했다(사용자 결정). 그래서 이 문서와 다른 작업 기록에 적힌 커밋 해시는 옛 값이다. 옛 → 새 대응:
+
+| 옛 | 새 |
+|---|---|
+| 6ed1148 | e5dc0b8 |
+| 3a95f5e | 1711133 |
+| cdb60ed | 064079a |
+| ab12412 | 2ae24b1 |
+| bae5bb3 | 8368ad5 |
+| ed7cbbb | b16b819 |
+| b6d3648 | 7754ad3 |
+| 4575dd4 | 19ab62b |
+| 61b8844 | 12bc981 |
+| f36315a | 1440bf2 |
+| f87f6bf | 9023cef |
+| 37904c2 | 207c0d1 |
+| be73433 | 050fd97 |
+| 33f1056 | 32c469d |
+| 615bfb6 | 28f24d6 |
+| 9cdc9b1 | bf6dbcd |
+| ff308ec | 81fa408 |
+| 2b5d241 | 1b57da3 |
+| fb11a83 | 7b20433 |
+| 7ba49fe | f83c62c |
+| 46b2a2d | 545abeb |
+| 8e38e0e | 679d77e |
+| 8819dc9 | 209ea69 |
+| 82ec907 | 20f8903 |
+| b957b91 | 6c6fca5 |
+| db8350d | 7de9f90 |
+| 1d756dd | 2d77838 |
+| b16f4af | 1cf372b |
