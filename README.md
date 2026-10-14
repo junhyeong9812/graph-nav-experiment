@@ -56,6 +56,7 @@
   - **갓 클래스:** 한 클래스에 절차의 시작부터 끝까지 담는다.
   - **레이어드:** `api · service · domain · infra` 계층으로 나눈다.
 - 같은 과제·판정·러너 방식(이 저장소의 방법론)으로 토큰과 정답률을 잰다.
+- 저장소: [clean-code-llm-experiment](https://github.com/junhyeong9812/clean-code-llm-experiment) (기본 세팅: [ADR-0001](https://github.com/junhyeong9812/clean-code-llm-experiment/blob/main/docs/adr/0001-base-setup.md))
 
 상세: [크기·구조](docs/analysis-size-structure.md) · [이름](docs/analysis-naming.md) · [지도 7조건](docs/analysis.md)
 
